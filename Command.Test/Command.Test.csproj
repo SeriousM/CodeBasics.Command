@@ -77,8 +77,10 @@
     <Compile Include="Core\CommandOutShould.cs" />
     <Compile Include="Core\SampleModel.cs" />
     <Compile Include="Core\ValidatorShould.cs" />
+    <Compile Include="Extensions\TypeExtensionsShould.cs" />
     <Compile Include="Mock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResultShould.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Command\Command.csproj">

@@ -17,7 +17,7 @@ namespace Command.Core
             this.outputValidator = outputValidator;
         }
 
-        internal static Result<TOut> DefinedResult(Func<TOut, bool> validate, Result<TOut> result)
+        internal static IResult<TOut> DefinedResult(Func<TOut, bool> validate, Result<TOut> result)
         {
             Guard.Requires<NullReferenceException>(result == null, "The result of OnExecute can not be null.");
             if (result.Status == Status.Success)
