@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <DebugType>Full</DebugType>
-    <Version>4.0.1</Version>
+    <Version>4.0.2</Version>
     <Description>Fournit des classes permettant la mise en place du pattern command</Description>
     <PackageTags>command pattern .net standard</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
