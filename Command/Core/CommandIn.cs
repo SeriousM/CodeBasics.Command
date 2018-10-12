@@ -18,12 +18,14 @@ namespace Command.Core
 
         public IResult Execute(TIn input)
         {
-            IResult result = new Result();
-            if (this.inputValidator.Validate(input))
+            IResult result = this.inputValidator.Validate(input);
+            if (result.Status == Status.Fail)
             {
-                result = this.OnExecute(input);
-                Guard.Requires<NullReferenceException>(result == null, "The result of OnExecute can not be null.");
+                return result;
             }
+
+            result = this.OnExecute(input);
+            Guard.Requires<NullReferenceException>(result == null, "The result of OnExecute can not be null.");
 
             return result;
         }

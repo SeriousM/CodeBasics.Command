@@ -9,7 +9,18 @@
 
     public sealed class Result<TValue> : IResult<TValue>
     {
-        public IList<string> Messages { get; } = new List<string>();
+        public Result()
+            : this(new Result())
+        {
+        }
+
+        public Result(IResult result)
+        {
+            this.Messages.AddRange(result.Messages);
+            this.Status = result.Status;
+        }
+
+        public List<string> Messages { get; } = new List<string>();
 
         public Status Status { get; set; } = Status.Fail;
 
@@ -18,14 +29,14 @@
 
     public interface IResult
     {
-        IList<string> Messages { get; }
+        List<string> Messages { get; }
 
         Status Status { get; }
     }
 
     public sealed class Result : IResult
     {
-        public IList<string> Messages { get; } = new List<string>();
+        public List<string> Messages { get; } = new List<string>();
 
         public Status Status { get; set; } = Status.Fail;
     }

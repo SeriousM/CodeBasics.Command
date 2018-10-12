@@ -5,8 +5,6 @@
 
     using Command.Core;
 
-    using Microsoft.Extensions.Logging;
-
     using Moq;
 
     using NUnit.Framework;
@@ -18,15 +16,15 @@
     [TestFixture]
     public class CommandInAsyncShould
     {
-        private const bool IS_NOT_VALID = false;
+        private readonly IResult IS_NOT_VALID = new Result();
 
-        private const bool IS_VALID = true;
+        private readonly IResult IS_VALID = new Result { Status = Status.Success };
 
         [Test]
         public async Task ReturnFailResultWhenInputIsNotValid()
         {
             Mock<IValidator<string>> validationMock = new Mock<IValidator<string>>();
-            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_NOT_VALID).Verifiable();
+            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(this.IS_NOT_VALID).Verifiable();
 
             var command = Mock.CreateInstanceOf<CommandInAsync<string>>(validationMock.Object);
             var result = await command.ExecuteAsync(It.IsAny<string>());
@@ -39,15 +37,11 @@
         public async Task ReturnSuccessResultWhenInputIsValid()
         {
             Mock<IValidator<string>> validationMock = new Mock<IValidator<string>>();
-            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_VALID).Verifiable();
+            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(this.IS_VALID).Verifiable();
 
             var command = Mock.CreateInstanceOf<CommandInAsync<string>>(
                 m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>()))
-                      .ReturnsAsync(
-                          new Result
-                              {
-                                  Status = Status.Success
-                              }),
+                      .ReturnsAsync(new Result { Status = Status.Success }),
                 validationMock.Object);
             var result = await command.ExecuteAsync(It.IsAny<string>());
 
@@ -59,15 +53,13 @@
         public void ThrownNullReferenceExceptionWhenOnExecuteAsyncReturnNullResult()
         {
             Mock<IValidator<string>> validationMock = new Mock<IValidator<string>>();
-            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_VALID).Verifiable();
+            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(this.IS_VALID).Verifiable();
 
             var command = Mock.CreateInstanceOf<CommandInAsync<string>>(
-                m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>()))
-                      .ReturnsAsync((Result)null),
+                m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>())).ReturnsAsync((Result)null),
                 validationMock.Object);
 
-            Should.ThrowAsync<NullReferenceException>(
-                      () => command.ExecuteAsync(It.IsAny<string>())).Result.Message
+            Should.ThrowAsync<NullReferenceException>(() => command.ExecuteAsync(It.IsAny<string>())).Result.Message
                   .ShouldBe("The result of task on OnExecuteAsync can not be null.");
         }
 
@@ -75,16 +67,13 @@
         public void ThrownNullReferenceExceptionWhenOnExecuteAsyncReturnNullTask()
         {
             Mock<IValidator<string>> validationMock = new Mock<IValidator<string>>();
-            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_VALID).Verifiable();
+            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(this.IS_VALID).Verifiable();
 
             var command = Mock.CreateInstanceOf<CommandInAsync<string>>(
-                m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>()))
-                      .Returns((Task<Result>)null),
+                m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>())).Returns((Task<Result>)null),
                 validationMock.Object);
 
-            Should.ThrowAsync<NullReferenceException>(
-                      () =>
-                          command.ExecuteAsync(It.IsAny<string>())).Result.Message
+            Should.ThrowAsync<NullReferenceException>(() => command.ExecuteAsync(It.IsAny<string>())).Result.Message
                   .ShouldBe("The task of OnExecute can not be null.");
         }
     }

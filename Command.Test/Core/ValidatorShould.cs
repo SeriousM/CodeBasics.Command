@@ -35,9 +35,10 @@
                     It.IsAny<Func<object, Exception, string>>())).Verifiable();
             var validator = new Validator<List<int>>(logger.Object);
 
-            validator.Validate(null);
+            var result = validator.Validate(null);
 
             logger.Verify();
+            result.Messages.ShouldContain("The value can not be null.");
         }
 
         [Test]
@@ -59,102 +60,87 @@
                     It.IsAny<Func<object, Exception, string>>())).Verifiable();
             var validator = new Validator<SampleModel>(logger.Object);
 
-            validator.Validate(
-                new SampleModel
-                    {
-                        Name = string.Empty
-                    });
+            var result = validator.Validate(new SampleModel { Name = string.Empty });
 
             logger.Verify();
+            result.Messages.ShouldContain(string.Format(expectedMessage, "Name"));
         }
 
         [Test]
-        public void ReturnFalseWhenDataAnnotationOnValueIsNotValid()
+        public void ReturnFailWhenDataAnnotationOnValueIsNotValid()
         {
             var logger = new Mock<ILogger<Validator<SampleModel>>>();
             var validator = new Validator<SampleModel>(logger.Object);
 
-            var valid = validator.Validate(
-                new SampleModel
-                    {
-                        Name = string.Empty
-                    });
+            var result = validator.Validate(new SampleModel { Name = string.Empty });
 
-            valid.ShouldBeFalse();
+            result.Status.ShouldBe(Status.Fail);
         }
 
         [Test]
-        public void ReturnFalseWhenDataAnnotationOnValueIsValidButOnValidateReturnFalse()
+        public void ReturnFailWhenDataAnnotationOnValueIsValidButOnValidateReturnFalse()
         {
-            var sampleModel = new SampleModel
-                                  {
-                                      Name = "correct Value"
-                                  };
+            var sampleModel = new SampleModel { Name = "correct Value" };
             var logger = new Mock<ILogger<Validator<SampleModel>>>();
             var validator = Mock.CreateInstanceOf<Validator<SampleModel>>(
-                m => m.Setup(v => v.OnValidate(sampleModel)).Returns(false),
+                m => m.Setup(v => v.OnValidate(sampleModel)).Returns(new Result()),
                 logger.Object);
 
-            var valid = validator.Validate(
-                sampleModel);
+            var result = validator.Validate(sampleModel);
 
-            valid.ShouldBeFalse();
+            result.Status.ShouldBe(Status.Fail);
         }
 
         [Test]
-        public void ReturnFalseWhenValueIsRefTypeAndNull()
+        public void ReturnFailWhenValueIsRefTypeAndNull()
         {
             var logger = new Mock<ILogger<Validator<List<int>>>>();
             var validator = new Validator<List<int>>(logger.Object);
 
-            var valid = validator.Validate(null);
+            var result = validator.Validate(null);
 
-            valid.ShouldBeFalse();
+            result.Status.ShouldBe(Status.Fail);
         }
 
         [Test]
-        public void ReturnTrueWhenDataAnnotationOnValueIsValid()
+        public void ReturnSuccessWhenDataAnnotationOnValueIsValid()
         {
             var logger = new Mock<ILogger<Validator<SampleModel>>>();
             var validator = new Validator<SampleModel>(logger.Object);
 
-            var valid = validator.Validate(
-                new SampleModel
-                    {
-                        Name = "correct value"
-                    });
+            var result = validator.Validate(new SampleModel { Name = "correct value" });
 
-            valid.ShouldBeTrue();
+            result.Status.ShouldBe(Status.Success);
         }
 
         [Test]
-        public void ReturnTrueWhenValueIsByRefAndNotNull()
+        public void ReturnSuccessWhenValueIsByRefAndNotNull()
         {
             var validator = new Validator<List<int>>(It.IsAny<ILogger<Validator<List<int>>>>());
 
-            var valid = validator.Validate(new List<int>());
+            var result = validator.Validate(new List<int>());
 
-            valid.ShouldBeTrue();
+            result.Status.ShouldBe(Status.Success);
         }
 
         [Test]
-        public void ReturnTrueWhenValueIsPrimitiveType()
+        public void ReturnSuccessWhenValueIsPrimitiveType()
         {
             var validator = new Validator<string>(It.IsAny<ILogger<Validator<string>>>());
 
-            var valid = validator.Validate(It.IsAny<string>());
+            var result = validator.Validate(It.IsAny<string>());
 
-            valid.ShouldBeTrue();
+            result.Status.ShouldBe(Status.Success);
         }
 
         [Test]
-        public void ReturnTrueWhenValueNullableType()
+        public void ReturnSuccessWhenValueNullableType()
         {
             var validator = new Validator<int?>(It.IsAny<ILogger<Validator<int?>>>());
 
-            var valid = validator.Validate(null);
+            var result = validator.Validate(null);
 
-            valid.ShouldBeTrue();
+            result.Status.ShouldBe(Status.Success);
         }
     }
 }

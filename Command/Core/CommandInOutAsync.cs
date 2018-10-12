@@ -26,16 +26,17 @@ namespace Command.Core
         
         public async Task<IResult<TOut>> ExecuteAsync(TIn input)
         {
-            var result = new Result<TOut>();
-            if (this.inputValidator.Validate(input))
+            var result = this.inputValidator.Validate(input);
+            if (result.Status != Status.Success)
             {
-                var task = this.OnExecuteAsync(input);
-                Guard.Requires<NullReferenceException>(task == null, "The task of OnExecute can not be null.");
-                result = await task;
-                return CommandOut<TOut>.DefinedResult(this.outputValidator.Validate, result);
+                return new Result<TOut>(result);
             }
 
-            return result;
+            var task = this.OnExecuteAsync(input);
+            Guard.Requires<NullReferenceException>(task == null, "The task of OnExecute can not be null.");
+            result = await task;
+            return CommandOut<TOut>.DefinedResult(this.outputValidator.Validate, (Result<TOut>)result);
+
         }
 
         protected internal abstract Task<Result<TOut>> OnExecuteAsync(TIn input);

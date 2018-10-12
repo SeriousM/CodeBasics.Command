@@ -19,16 +19,18 @@ namespace Command.Core
 
         public async Task<IResult> ExecuteAsync(TIn input)
         {
-            var result = new Result();
-            if (this.inputValidator.Validate(input))
+            var result = this.inputValidator.Validate(input);
+            if (result.Status == Status.Fail)
             {
-                var task = this.OnExecuteAsync(input);
-                Guard.Requires<NullReferenceException>(task == null, "The task of OnExecute can not be null.");
-                result = await task;
-                Guard.Requires<NullReferenceException>(
-                    result == null,
-                    "The result of task on OnExecuteAsync can not be null.");
+                return result;
             }
+
+            var task = this.OnExecuteAsync(input);
+            Guard.Requires<NullReferenceException>(task == null, "The task of OnExecute can not be null.");
+            result = await task;
+            Guard.Requires<NullReferenceException>(
+                result == null,
+                "The result of task on OnExecuteAsync can not be null.");
 
             return result;
         }

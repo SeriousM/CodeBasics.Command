@@ -1,7 +1,5 @@
 namespace Command.Core
 {
-    using System;
-
     public interface ICommandInOut<in TIn, out TOut>
     {
         IResult<TOut> Execute(TIn input);
@@ -13,9 +11,7 @@ namespace Command.Core
 
         private readonly IValidator<TOut> outputValidator;
 
-        protected CommandInOut(
-            IValidator<TIn> inputValidator,
-            IValidator<TOut> outputValidator)
+        protected CommandInOut(IValidator<TIn> inputValidator, IValidator<TOut> outputValidator)
         {
             this.inputValidator = inputValidator;
             this.outputValidator = outputValidator;
@@ -23,14 +19,15 @@ namespace Command.Core
 
         public IResult<TOut> Execute(TIn input)
         {
-            var result = new Result<TOut>();
-            if (this.inputValidator.Validate(input))
+            var result = this.inputValidator.Validate(input);
+            result = new Result<TOut>(result);
+            if (result.Status == Status.Fail)
             {
-                result = this.OnExecute(input);
-                return CommandOut<TOut>.DefinedResult(this.outputValidator.Validate, result);
+                return new Result<TOut>(result);
             }
 
-            return result;
+            result = this.OnExecute(input);
+            return CommandOut<TOut>.DefinedResult(this.outputValidator.Validate, (Result<TOut>)result);
         }
 
         protected internal abstract Result<TOut> OnExecute(TIn input);

@@ -15,15 +15,15 @@
     [TestFixture]
     public class CommandInShould
     {
-        private const bool IS_NOT_VALID = false;
+        private readonly IResult IS_NOT_VALID = new Result();
 
-        private const bool IS_VALID = true;
+        private readonly IResult IS_VALID = new Result { Status = Status.Success };
 
         [Test]
         public void ReturnFailResultWhenInputIsNotValid()
         {
             Mock<IValidator<string>> validationMock = new Mock<IValidator<string>>();
-            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_NOT_VALID).Verifiable();
+            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(this.IS_NOT_VALID).Verifiable();
 
             var command = Mock.CreateInstanceOf<CommandIn<string>>(validationMock.Object);
             var result = command.Execute(It.IsAny<string>());
@@ -36,7 +36,7 @@
         public void ReturnSuccessResultWhenInputIsValid()
         {
             Mock<IValidator<string>> validationMock = new Mock<IValidator<string>>();
-            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_VALID).Verifiable();
+            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(this.IS_VALID).Verifiable();
 
             var command = Mock.CreateInstanceOf<CommandIn<string>>(
                 m => m.Setup(c => c.OnExecute(It.IsAny<string>())).Returns(
@@ -55,7 +55,7 @@
         public void ThrownNullReferenceExceptionWhenOnExecuteReturnNullResult()
         {
             Mock<IValidator<string>> validationMock = new Mock<IValidator<string>>();
-            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_VALID).Verifiable();
+            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(this.IS_VALID).Verifiable();
 
             var command = Mock.CreateInstanceOf<CommandIn<string>>(
                 m => m.Setup(c => c.OnExecute(It.IsAny<string>()))

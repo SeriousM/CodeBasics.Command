@@ -11,7 +11,7 @@
 
     public interface IValidator<in T>
     {
-        bool Validate(T value);
+        IResult Validate(T value);
     }
 
     public class Validator<T> : IValidator<T>
@@ -23,21 +23,24 @@
 
         protected ILogger<Validator<T>> Logger { get; }
 
-        public bool Validate(T value)
+        public IResult Validate(T value)
         {
+            var result = new Result { Status = Status.Fail };
             Type valueType = typeof(T);
             bool isNull = value == null;
-            if (valueType.IsPrimitive()
-                || (isNull && valueType.GetTypeInfo().IsGenericType
-                           && valueType.GetGenericTypeDefinition() == typeof(Nullable<>)))
+            if (valueType.IsPrimitive() || (isNull && valueType.GetTypeInfo().IsGenericType
+                                                   && valueType.GetGenericTypeDefinition() == typeof(Nullable<>)))
             {
-                return true;
+                result.Status = Status.Success;
+                return result;
             }
 
             if (isNull)
             {
-                this.Logger.LogError("The value can not be null.");
-                return false;
+                var message = "The value can not be null.";
+                this.Logger.LogError(message);
+                result.Messages.Add(message);
+                return result;
             }
 
             var validationResults = new List<ValidationResult>();
@@ -46,13 +49,26 @@
                 new ValidationContext(value, null, null),
                 validationResults,
                 true);
-            validationResults.ForEach(validationResult => this.Logger.LogInformation(validationResult.ToString()));
-            return valid && this.OnValidate(value);
+
+            if (!valid)
+            {
+                validationResults.ForEach(
+                    validationResult =>
+                        {
+                            var message = validationResult.ToString();
+                            result.Messages.Add(message);
+                            this.Logger.LogInformation(message);
+                        });
+                result.Status = Status.Fail;
+                return result;
+            }
+
+            return this.OnValidate(value);
         }
 
-        protected internal virtual bool OnValidate(T value)
+        protected internal virtual IResult OnValidate(T value)
         {
-            return true;
+            return new Result { Status = Status.Success };
         }
     }
 }
