@@ -1,78 +1,72 @@
-﻿namespace Command.Test.Core
+﻿using System;
+using Command.Core;
+using Moq;
+using NUnit.Framework;
+using Shouldly;
+
+namespace Command.Test.Core
 {
-    using System;
+  [TestFixture]
+  public class CommandOutShould
+  {
+    private const bool isNotValid = false;
 
-    using Command.Core;
+    private const bool isValid = true;
 
-    using Moq;
-
-    using NUnit.Framework;
-
-    using Shouldly;
-
-    using Mock = Test.Mock;
-
-    [TestFixture]
-    public class CommandOutShould
+    [Test]
+    public void ReturnFailResultWhenOutputIsNotValid()
     {
-        private const bool IS_NOT_VALID = false;
+      var validationMock = new Mock<IValidator<string>>();
+      validationMock.Setup(v => v.Validate("not valid value")).Returns(isNotValid).Verifiable();
 
-        private const bool IS_VALID = true;
+      var command = Mock.CreateInstanceOf<CommandOut<string>>(
+        m => m.Setup(c => c.OnExecute()).Returns(
+          new Result<string>
+          {
+            Status = Status.Success,
+            Value = "not valid value"
+          }),
+        validationMock.Object);
+      var result = command.Execute();
 
-        [Test]
-        public void ReturnFailResultWhenOutputIsNotValid()
-        {
-            Mock<IValidator<string>> validationMock = new Mock<IValidator<string>>();
-            validationMock.Setup(v => v.Validate("not valid value")).Returns(IS_NOT_VALID).Verifiable();
-
-            var command = Mock.CreateInstanceOf<CommandOut<string>>(
-                m => m.Setup(c => c.OnExecute()).Returns(
-                    new Result<string>
-                        {
-                            Status = Status.Success,
-                            Value = "not valid value"
-                        }),
-                validationMock.Object);
-            var result = command.Execute();
-
-            result.Status.ShouldBe(Status.Fail);
-            validationMock.Verify();
-        }
-
-        [Test]
-        public void ReturnSuccessResultWhenInputIsValid()
-        {
-            Mock<IValidator<string>> validationMock = new Mock<IValidator<string>>();
-            validationMock.Setup(v => v.Validate("valid value")).Returns(IS_VALID).Verifiable();
-
-            var command = Mock.CreateInstanceOf<CommandOut<string>>(
-                m => m.Setup(c => c.OnExecute()).Returns(
-                    new Result<string>
-                        {
-                            Status = Status.Success,
-                            Value = "valid value"
-                        }),
-                validationMock.Object);
-            var result = command.Execute();
-
-            result.Status.ShouldBe(Status.Success);
-            validationMock.Verify();
-        }
-
-        [Test]
-        public void ThrownNullReferenceExceptionWhenOnExecuteReturnNullResult()
-        {
-            Mock<IValidator<string>> validationMock = new Mock<IValidator<string>>();
-            validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_VALID).Verifiable();
-
-            var command = Mock.CreateInstanceOf<CommandOut<string>>(
-                m => m.Setup(c => c.OnExecute())
-                      .Returns((Result<string>)null),
-                validationMock.Object);
-
-            Should.Throw<NullReferenceException>(
-                      () => command.Execute()).Message
-                  .ShouldBe("The result of OnExecute can not be null.");
-        }
+      result.Status.ShouldBe(Status.Fail);
+      validationMock.Verify();
     }
+
+    [Test]
+    public void ReturnSuccessResultWhenInputIsValid()
+    {
+      var validationMock = new Mock<IValidator<string>>();
+      validationMock.Setup(v => v.Validate("valid value")).Returns(isValid).Verifiable();
+
+      var command = Mock.CreateInstanceOf<CommandOut<string>>(
+        m => m.Setup(c => c.OnExecute()).Returns(
+          new Result<string>
+          {
+            Status = Status.Success,
+            Value = "valid value"
+          }),
+        validationMock.Object);
+      var result = command.Execute();
+
+      result.Status.ShouldBe(Status.Success);
+      validationMock.Verify();
+    }
+
+    [Test]
+    public void ThrownNullReferenceExceptionWhenOnExecuteReturnNullResult()
+    {
+      var validationMock = new Mock<IValidator<string>>();
+      validationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(isValid).Verifiable();
+
+      var command = Mock.CreateInstanceOf<CommandOut<string>>(
+        m => m.Setup(c => c.OnExecute())
+              .Returns((Result<string>)null),
+        validationMock.Object);
+
+      Should.Throw<NullReferenceException>(
+               () => command.Execute()).Message
+            .ShouldBe("The result of OnExecute can not be null.");
+    }
+  }
 }

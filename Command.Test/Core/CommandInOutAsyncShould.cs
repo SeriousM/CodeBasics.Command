@@ -1,120 +1,114 @@
-﻿namespace Command.Test.Core
+﻿using System;
+using System.Threading.Tasks;
+using Command.Core;
+using Moq;
+using NUnit.Framework;
+using Shouldly;
+
+namespace Command.Test.Core
 {
-    using System;
-    using System.Threading.Tasks;
+  [TestFixture]
+  public class CommandInOutAsyncShould
+  {
+    private const bool isNotValid = false;
 
-    using Command.Core;
+    private const bool isValid = true;
 
-    using Moq;
-
-    using NUnit.Framework;
-
-    using Shouldly;
-
-    using Mock = Test.Mock;
-
-    [TestFixture]
-    public class CommandInOutAsyncShould
+    [Test]
+    public async Task ReturnFailResultWhenInputIsNotValid()
     {
-        private const bool IS_NOT_VALID = false;
+      var inputValidationMock = new Mock<IValidator<string>>();
+      inputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(isNotValid).Verifiable();
 
-        private const bool IS_VALID = true;
+      var command = Mock.CreateInstanceOf<CommandInOutAsync<string, string>>(
+        inputValidationMock.Object,
+        It.IsAny<Validator<string>>());
+      var result = await command.ExecuteAsync(It.IsAny<string>());
 
-        [Test]
-        public async Task ReturnFailResultWhenInputIsNotValid()
-        {
-            Mock<IValidator<string>> inputValidationMock = new Mock<IValidator<string>>();
-            inputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_NOT_VALID).Verifiable();
-
-            var command = Mock.CreateInstanceOf<CommandInOutAsync<string, string>>(
-                inputValidationMock.Object,
-                It.IsAny<Validator<string>>());
-            var result = await command.ExecuteAsync(It.IsAny<string>());
-
-            result.Status.ShouldBe(Status.Fail);
-            inputValidationMock.Verify();
-        }
-
-        [Test]
-        public async Task ReturnFailResultWhenOutputIsNotValid()
-        {
-            Mock<IValidator<string>> inputValidationMock = new Mock<IValidator<string>>();
-            Mock<IValidator<string>> outputValidationMock = new Mock<IValidator<string>>();
-            inputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_VALID).Verifiable();
-            outputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_NOT_VALID).Verifiable();
-
-            var command = Mock.CreateInstanceOf<CommandInOutAsync<string, string>>(
-                m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>())).ReturnsAsync(
-                    new Result<string>
-                        {
-                            Status = Status.Success
-                        }),
-                inputValidationMock.Object,
-                outputValidationMock.Object);
-            var result = await command.ExecuteAsync(It.IsAny<string>());
-
-            result.Status.ShouldBe(Status.Fail);
-            inputValidationMock.Verify();
-            outputValidationMock.Verify();
-        }
-
-        [Test]
-        public async Task ReturnSuccessResultWhenInputAndOutputIsValid()
-        {
-            Mock<IValidator<string>> inputValidationMock = new Mock<IValidator<string>>();
-            Mock<IValidator<string>> outputValidationMock = new Mock<IValidator<string>>();
-            inputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_VALID).Verifiable();
-            outputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_VALID).Verifiable();
-
-            var command = Mock.CreateInstanceOf<CommandInOutAsync<string, string>>(
-                m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>())).ReturnsAsync(
-                    new Result<string>
-                        {
-                            Status = Status.Success
-                        }),
-                inputValidationMock.Object,
-                outputValidationMock.Object);
-            var result = await command.ExecuteAsync(It.IsAny<string>());
-
-            result.Status.ShouldBe(Status.Success);
-            inputValidationMock.Verify();
-            outputValidationMock.Verify();
-        }
-
-        [Test]
-        public void ThrownNullReferenceExceptionWhenOnExecuteReturnNullResult()
-        {
-            Mock<IValidator<string>> inputValidationMock = new Mock<IValidator<string>>();
-            Mock<IValidator<string>> outputValidationMock = new Mock<IValidator<string>>();
-            inputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_VALID).Verifiable();
-
-            var command = Mock.CreateInstanceOf<CommandInOutAsync<string, string>>(
-                m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>()))
-                      .ReturnsAsync((Result<string>)null),
-                inputValidationMock.Object,
-                outputValidationMock.Object);
-
-            Should.Throw<NullReferenceException>(
-                      () => command.ExecuteAsync(It.IsAny<string>())).Message
-                  .ShouldBe("The result of OnExecute can not be null.");
-        }
-
-        [Test]
-        public void ThrownNullReferenceExceptionWhenOnExecuteReturnNullTask()
-        {
-            Mock<IValidator<string>> inputValidationMock = new Mock<IValidator<string>>();
-            Mock<IValidator<string>> outputValidationMock = new Mock<IValidator<string>>();
-            inputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(IS_VALID).Verifiable();
-
-            var command = Mock.CreateInstanceOf<CommandInOutAsync<string, string>>(
-                m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>()))
-                      .Returns((Task<Result<string>>)null),
-                inputValidationMock.Object,
-                outputValidationMock.Object);
-
-            Should.Throw<NullReferenceException>(
-                      () => command.ExecuteAsync(It.IsAny<string>())).Message
-                  .ShouldBe("The task of OnExecute can not be null.");
-        }
+      result.Status.ShouldBe(Status.Fail);
+      inputValidationMock.Verify();
     }
+
+    [Test]
+    public async Task ReturnFailResultWhenOutputIsNotValid()
+    {
+      var inputValidationMock = new Mock<IValidator<string>>();
+      var outputValidationMock = new Mock<IValidator<string>>();
+      inputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(isValid).Verifiable();
+      outputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(isNotValid).Verifiable();
+
+      var command = Mock.CreateInstanceOf<CommandInOutAsync<string, string>>(
+        m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>())).ReturnsAsync(
+          new Result<string>
+          {
+            Status = Status.Success
+          }),
+        inputValidationMock.Object,
+        outputValidationMock.Object);
+      var result = await command.ExecuteAsync(It.IsAny<string>());
+
+      result.Status.ShouldBe(Status.Fail);
+      inputValidationMock.Verify();
+      outputValidationMock.Verify();
+    }
+
+    [Test]
+    public async Task ReturnSuccessResultWhenInputAndOutputIsValid()
+    {
+      var inputValidationMock = new Mock<IValidator<string>>();
+      var outputValidationMock = new Mock<IValidator<string>>();
+      inputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(isValid).Verifiable();
+      outputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(isValid).Verifiable();
+
+      var command = Mock.CreateInstanceOf<CommandInOutAsync<string, string>>(
+        m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>())).ReturnsAsync(
+          new Result<string>
+          {
+            Status = Status.Success
+          }),
+        inputValidationMock.Object,
+        outputValidationMock.Object);
+      var result = await command.ExecuteAsync(It.IsAny<string>());
+
+      result.Status.ShouldBe(Status.Success);
+      inputValidationMock.Verify();
+      outputValidationMock.Verify();
+    }
+
+    [Test]
+    public void ThrownNullReferenceExceptionWhenOnExecuteReturnNullResult()
+    {
+      var inputValidationMock = new Mock<IValidator<string>>();
+      var outputValidationMock = new Mock<IValidator<string>>();
+      inputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(isValid).Verifiable();
+
+      var command = Mock.CreateInstanceOf<CommandInOutAsync<string, string>>(
+        m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>()))
+              .ReturnsAsync((Result<string>)null),
+        inputValidationMock.Object,
+        outputValidationMock.Object);
+
+      Should.Throw<NullReferenceException>(
+               () => command.ExecuteAsync(It.IsAny<string>())).Message
+            .ShouldBe("The result of OnExecute can not be null.");
+    }
+
+    [Test]
+    public void ThrownNullReferenceExceptionWhenOnExecuteReturnNullTask()
+    {
+      var inputValidationMock = new Mock<IValidator<string>>();
+      var outputValidationMock = new Mock<IValidator<string>>();
+      inputValidationMock.Setup(v => v.Validate(It.IsAny<string>())).Returns(isValid).Verifiable();
+
+      var command = Mock.CreateInstanceOf<CommandInOutAsync<string, string>>(
+        m => m.Setup(c => c.OnExecuteAsync(It.IsAny<string>()))
+              .Returns((Task<Result<string>>)null),
+        inputValidationMock.Object,
+        outputValidationMock.Object);
+
+      Should.Throw<NullReferenceException>(
+               () => command.ExecuteAsync(It.IsAny<string>())).Message
+            .ShouldBe("The task of OnExecute can not be null.");
+    }
+  }
 }

@@ -1,10 +1,10 @@
-﻿namespace Command.Test.Core
-{
-    using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-    public class SampleModel
-    {
-        [Required]
-        public string Name { get; set; }
-    }
+namespace Command.Test.Core
+{
+  public class SampleModel
+  {
+    [Required]
+    public string Name { get; set; }
+  }
 }

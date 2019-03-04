@@ -1,43 +1,42 @@
+using System;
+using System.Threading.Tasks;
+
 namespace Command.Core
 {
-    using System;
-    using System.Threading.Tasks;
+  public interface ICommandInOutAsync<in TIn, TOut>
+  {
+    Task<IResult<TOut>> ExecuteAsync(TIn input);
+  }
 
-    using Microsoft.Extensions.Logging;
+  public abstract class CommandInOutAsync<TIn, TOut> : ICommandInOutAsync<TIn, TOut>
+  {
+    private readonly IValidator<TIn> inputValidator;
 
-    public interface ICommandInOutAsync<in TIn, TOut>
+    private readonly IValidator<TOut> outputValidator;
+
+    protected CommandInOutAsync(
+      IValidator<TIn> inputValidator,
+      IValidator<TOut> outputValidator)
     {
-        Task<IResult<TOut>> ExecuteAsync(TIn input);
+      this.inputValidator = inputValidator;
+      this.outputValidator = outputValidator;
     }
 
-    public abstract class CommandInOutAsync<TIn, TOut> : ICommandInOutAsync<TIn, TOut>
+    public async Task<IResult<TOut>> ExecuteAsync(TIn input)
     {
-        private readonly IValidator<TIn> inputValidator;
+      var result = new Result<TOut>();
+      if (inputValidator.Validate(input))
+      {
+        var task = OnExecuteAsync(input);
+        Guard.Requires<NullReferenceException>(task == null, "The task of OnExecute can not be null.");
+        result = await task;
 
-        private readonly IValidator<TOut> outputValidator;
+        return CommandOut<TOut>.DefinedResult(outputValidator.Validate, result);
+      }
 
-        protected CommandInOutAsync(
-            IValidator<TIn> inputValidator,
-            IValidator<TOut> outputValidator)
-        {
-            this.inputValidator = inputValidator;
-            this.outputValidator = outputValidator;
-        }
-        
-        public async Task<IResult<TOut>> ExecuteAsync(TIn input)
-        {
-            var result = new Result<TOut>();
-            if (this.inputValidator.Validate(input))
-            {
-                var task = this.OnExecuteAsync(input);
-                Guard.Requires<NullReferenceException>(task == null, "The task of OnExecute can not be null.");
-                result = await task;
-                return CommandOut<TOut>.DefinedResult(this.outputValidator.Validate, result);
-            }
-
-            return result;
-        }
-
-        protected internal abstract Task<Result<TOut>> OnExecuteAsync(TIn input);
+      return result;
     }
+
+    protected internal abstract Task<Result<TOut>> OnExecuteAsync(TIn input);
+  }
 }

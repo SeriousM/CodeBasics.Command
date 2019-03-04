@@ -1,31 +1,32 @@
+using System;
+using System.Threading.Tasks;
+
 namespace Command.Core
 {
-    using System;
-    using System.Threading.Tasks;
+  public interface ICommandOutAsync<TOut>
+  {
+    Task<IResult<TOut>> ExecuteAsync();
+  }
 
-    public interface ICommandOutAsync<TOut>
+  public abstract class CommandOutAsync<TOut> : ICommandOutAsync<TOut>
+  {
+    private readonly IValidator<TOut> outputValidator;
+
+    protected CommandOutAsync(
+      IValidator<TOut> outputValidator)
     {
-        Task<IResult<TOut>> ExecuteAsync();
+      this.outputValidator = outputValidator;
     }
 
-    public abstract class CommandOutAsync<TOut> : ICommandOutAsync<TOut>
+    public async Task<IResult<TOut>> ExecuteAsync()
     {
-        private readonly IValidator<TOut> outputValidator;
+      var task = OnExecuteAsync();
+      Guard.Requires<NullReferenceException>(task == null, "The task of OnExecute can not be null.");
+      var result = await task;
 
-        protected CommandOutAsync(
-            IValidator<TOut> outputValidator)
-        {
-            this.outputValidator = outputValidator;
-        }
-
-        public async Task<IResult<TOut>> ExecuteAsync()
-        {
-            var task = this.OnExecuteAsync();
-            Guard.Requires<NullReferenceException>(task == null, "The task of OnExecute can not be null.");
-            var result = await task;
-            return CommandOut<TOut>.DefinedResult(this.outputValidator.Validate, result);
-        }
-
-        protected internal abstract Task<Result<TOut>> OnExecuteAsync();
+      return CommandOut<TOut>.DefinedResult(outputValidator.Validate, result);
     }
+
+    protected internal abstract Task<Result<TOut>> OnExecuteAsync();
+  }
 }
