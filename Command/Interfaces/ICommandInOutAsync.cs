@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 namespace Command
 {
-  public interface ICommandInOutAsync<in TIn, TOut>
+  public interface ICommandInOutAsync<TOut>
   {
     Task<IResult<TOut>> ExecuteAsync();
   }

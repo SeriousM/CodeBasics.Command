@@ -12,10 +12,17 @@ namespace Command.Implementation
       this.services = services;
     }
 
-    public ICommandInOutAsync<TIn, TOut> CreateAsync<TCommand, TIn, TOut>(TIn input) where TCommand : ICommandInOutAsync<TIn, TOut>
+    public ICommandInOutAsync<TOut> CreateAsync<TCommand, TIn, TOut>(TIn input) where TCommand : ICommandInOutAsync<TOut>
     {
-      var command = services.GetRequiredService<ICommandInOutAsync<TIn, TOut>>();
-      ((ICommandSetInput<TIn>)command).SetInputParameter(input);
+      var command = services.GetRequiredService<ICommandInOutAsync<TOut>>();
+      if (command is ICommandSetInput<TIn> cmd)
+      {
+        cmd.SetInputParameter(input);
+      }
+      else
+      {
+        throw new ArgumentException($"Command '{typeof(TCommand).FullName}' does not implement '{typeof(ICommandSetInput<TIn>).Name}'. Maybe the wrong type was implemented?");
+      }
 
       return command;
     }

@@ -16,7 +16,7 @@ namespace Command.Test.Implementation
     {
       services = new ServiceCollection()
                 .AddCommands()
-                .AddSingleton<ICommandInOutAsync<int, int>, TestCommand>()
+                .AddSingleton<ICommandInOutAsync<int>, TestCommand>()
                 .BuildServiceProvider();
     }
 

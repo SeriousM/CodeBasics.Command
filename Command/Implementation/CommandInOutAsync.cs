@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Command.Implementation
 {
-  public abstract class CommandInOutAsync<TIn, TOut> : ICommandInOutAsync<TIn, TOut>, ICommandSetInput<TIn>
+  public abstract class CommandInOutAsync<TIn, TOut> : ICommandInOutAsync<TOut>, ICommandSetInput<TIn>
   {
     private readonly IValidator<TIn> inputValidator;
     private readonly IValidator<TOut> outputValidator;
