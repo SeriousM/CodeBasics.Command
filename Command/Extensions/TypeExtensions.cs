@@ -5,7 +5,7 @@ namespace Command.Extensions
 {
   internal static class TypeExtensions
   {
-    public static bool IsPrimitive(this Type that)
+    public static bool IsPrimitive(Type that)
     {
       return that.GetTypeInfo().IsPrimitive
           || that == typeof(string)

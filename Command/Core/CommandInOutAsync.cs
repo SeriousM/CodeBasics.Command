@@ -3,11 +3,6 @@ using System.Threading.Tasks;
 
 namespace Command.Core
 {
-  public interface ICommandInOutAsync<in TIn, TOut>
-  {
-    Task<IResult<TOut>> ExecuteAsync(TIn input);
-  }
-
   public abstract class CommandInOutAsync<TIn, TOut> : ICommandInOutAsync<TIn, TOut>
   {
     private readonly IValidator<TIn> inputValidator;
@@ -28,10 +23,28 @@ namespace Command.Core
       if (inputValidator.Validate(input))
       {
         var task = OnExecuteAsync(input);
-        Guard.Requires<NullReferenceException>(task == null, "The task of OnExecute can not be null.");
+        
+        if (task is null)
+        {
+          throw new NullReferenceException("The task of OnExecute can not be null.");
+        }
+
         result = await task;
 
-        return CommandOut<TOut>.DefinedResult(outputValidator.Validate, result);
+        if (result is null)
+        {
+          throw new NullReferenceException("The result of OnExecute can not be null.");
+        }
+
+        if (result.Status == Status.Success)
+        {
+          var valid = outputValidator.Validate(result.Value);
+          result.Status = valid
+            ? Status.Success
+            : Status.Fail;
+        }
+
+        return result;
       }
 
       return result;

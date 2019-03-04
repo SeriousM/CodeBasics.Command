@@ -69,12 +69,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\CommandInAsyncShould.cs" />
     <Compile Include="Core\CommandInOutAsyncShould.cs" />
     <Compile Include="Core\CommandInOutShould.cs" />
-    <Compile Include="Core\CommandInShould.cs" />
-    <Compile Include="Core\CommandOutAsyncShould.cs" />
-    <Compile Include="Core\CommandOutShould.cs" />
     <Compile Include="Core\SampleModel.cs" />
     <Compile Include="Core\ValidatorShould.cs" />
     <Compile Include="Extensions\TypeExtensionsShould.cs" />

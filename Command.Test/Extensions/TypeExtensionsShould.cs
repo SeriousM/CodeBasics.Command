@@ -12,42 +12,42 @@ namespace Command.Test.Extensions
     public void ReturnTrueWhenCallIsPrimitiveForDateTimeType()
     {
       var stringType = DateTime.Now.GetType();
-      stringType.IsPrimitive().ShouldBeTrue();
+      TypeExtensions.IsPrimitive(stringType).ShouldBeTrue();
     }
 
     [Test]
     public void ReturnTrueWhenCallIsPrimitiveForDecimalType()
     {
       var stringType = 1.2m.GetType();
-      stringType.IsPrimitive().ShouldBeTrue();
+      TypeExtensions.IsPrimitive(stringType).ShouldBeTrue();
     }
 
     [Test]
     public void ReturnTrueWhenCallIsPrimitiveForDoubleType()
     {
       var stringType = 1.3d.GetType();
-      stringType.IsPrimitive().ShouldBeTrue();
+      TypeExtensions.IsPrimitive(stringType).ShouldBeTrue();
     }
 
     [Test]
     public void ReturnTrueWhenCallIsPrimitiveForGuidType()
     {
       var guidType = Guid.NewGuid().GetType();
-      guidType.IsPrimitive().ShouldBeTrue();
+      TypeExtensions.IsPrimitive(guidType).ShouldBeTrue();
     }
 
     [Test]
     public void ReturnTrueWhenCallIsPrimitiveForIntType()
     {
       var stringType = 1.GetType();
-      stringType.IsPrimitive().ShouldBeTrue();
+      TypeExtensions.IsPrimitive(stringType).ShouldBeTrue();
     }
 
     [Test]
     public void ReturnTrueWhenCallIsPrimitiveForStringType()
     {
       var stringType = "".GetType();
-      stringType.IsPrimitive().ShouldBeTrue();
+      TypeExtensions.IsPrimitive(stringType).ShouldBeTrue();
     }
   }
 }

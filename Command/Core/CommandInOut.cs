@@ -1,10 +1,7 @@
+using System;
+
 namespace Command.Core
 {
-  public interface ICommandInOut<in TIn, out TOut>
-  {
-    IResult<TOut> Execute(TIn input);
-  }
-
   public abstract class CommandInOut<TIn, TOut> : ICommandInOut<TIn, TOut>
   {
     private readonly IValidator<TIn> inputValidator;
@@ -26,7 +23,20 @@ namespace Command.Core
       {
         result = OnExecute(input);
 
-        return CommandOut<TOut>.DefinedResult(outputValidator.Validate, result);
+        if (result is null)
+        {
+          throw new NullReferenceException("The result of OnExecute can not be null.");
+        }
+
+        if (result.Status == Status.Success)
+        {
+          var valid = outputValidator.Validate(result.Value);
+          result.Status = valid
+            ? Status.Success
+            : Status.Fail;
+        }
+
+        return result;
       }
 
       return result;

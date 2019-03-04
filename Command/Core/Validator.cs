@@ -7,11 +7,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Command.Core
 {
-  public interface IValidator<in T>
-  {
-    bool Validate(T value);
-  }
-
   public class Validator<T> : IValidator<T>
   {
     public Validator(ILogger<Validator<T>> logger)
@@ -25,7 +20,7 @@ namespace Command.Core
     {
       var valueType = typeof(T);
       var isNull = value == null;
-      if (valueType.IsPrimitive()
+      if (TypeExtensions.IsPrimitive(valueType)
        || isNull
        && valueType.GetTypeInfo().IsGenericType
        && valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
