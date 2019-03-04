@@ -1,4 +1,4 @@
-﻿namespace Command.Core
+﻿namespace Command
 {
   public interface IValidator<in T>
   {

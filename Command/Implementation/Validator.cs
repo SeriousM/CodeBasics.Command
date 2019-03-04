@@ -5,7 +5,7 @@ using System.Reflection;
 using Command.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace Command.Core
+namespace Command.Implementation
 {
   public class Validator<T> : IValidator<T>
   {

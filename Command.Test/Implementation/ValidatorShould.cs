@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using Command.Core;
+using Command.Implementation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using NUnit.Framework;
 using Shouldly;
 
-namespace Command.Test.Core
+namespace Command.Test.Implementation
 {
-  [TestFixture]
+  [TestClass]
   public class ValidatorShould
   {
-    [Test]
+    [TestMethod]
     public void LogErrorWhenValueIsRefTypeAndNull()
     {
       var logger = new Mock<ILogger<Validator<List<int>>>>();
@@ -33,7 +33,7 @@ namespace Command.Test.Core
       logger.Verify();
     }
 
-    [Test]
+    [TestMethod]
     public void LogInformationWhenDataAnnotationOnValueIsNotValid()
     {
       ValidationAttribute attribute = new RequiredAttribute();
@@ -61,7 +61,7 @@ namespace Command.Test.Core
       logger.Verify();
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnFalseWhenDataAnnotationOnValueIsNotValid()
     {
       var logger = new Mock<ILogger<Validator<SampleModel>>>();
@@ -76,7 +76,7 @@ namespace Command.Test.Core
       valid.ShouldBeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnFalseWhenDataAnnotationOnValueIsValidButOnValidateReturnFalse()
     {
       var sampleModel = new SampleModel
@@ -94,7 +94,7 @@ namespace Command.Test.Core
       valid.ShouldBeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnFalseWhenValueIsRefTypeAndNull()
     {
       var logger = new Mock<ILogger<Validator<List<int>>>>();
@@ -105,7 +105,7 @@ namespace Command.Test.Core
       valid.ShouldBeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnTrueWhenDataAnnotationOnValueIsValid()
     {
       var logger = new Mock<ILogger<Validator<SampleModel>>>();
@@ -120,7 +120,7 @@ namespace Command.Test.Core
       valid.ShouldBeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnTrueWhenValueIsByRefAndNotNull()
     {
       var validator = new Validator<List<int>>(It.IsAny<ILogger<Validator<List<int>>>>());
@@ -130,7 +130,7 @@ namespace Command.Test.Core
       valid.ShouldBeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnTrueWhenValueIsPrimitiveType()
     {
       var validator = new Validator<string>(It.IsAny<ILogger<Validator<string>>>());
@@ -140,7 +140,7 @@ namespace Command.Test.Core
       valid.ShouldBeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnTrueWhenValueNullableType()
     {
       var validator = new Validator<int?>(It.IsAny<ILogger<Validator<int?>>>());

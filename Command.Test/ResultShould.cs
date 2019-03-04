@@ -1,22 +1,23 @@
-﻿using NUnit.Framework;
+﻿using Command.Implementation;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
 namespace Command.Test
 {
-  [TestFixture]
+  [TestClass]
   public class ResultShould
   {
-    [Test]
+    [TestMethod]
     public void ReturnFailStatusWhenResultIsConstruct()
     {
-      var result = new Result<object>();
+      var result = Result<object>.ExecutionFail("failed");
       result.Status.ShouldBe(Status.Fail);
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnInstanceOfMessagesWhenResultIsConstruct()
     {
-      var result = new Result<object>();
+      var result = Result<object>.ExecutionFail("failed");
       result.Messages.ShouldNotBeNull();
     }
   }

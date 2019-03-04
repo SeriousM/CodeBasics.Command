@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Command.Test.Core
+namespace Command.Test.Implementation
 {
   public class SampleModel
   {

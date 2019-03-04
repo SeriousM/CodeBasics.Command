@@ -1,49 +1,49 @@
 ﻿using System;
 using Command.Extensions;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
 namespace Command.Test.Extensions
 {
-  [TestFixture]
+  [TestClass]
   public class TypeExtensionsShould
   {
-    [Test]
+    [TestMethod]
     public void ReturnTrueWhenCallIsPrimitiveForDateTimeType()
     {
       var stringType = DateTime.Now.GetType();
       TypeExtensions.IsPrimitive(stringType).ShouldBeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnTrueWhenCallIsPrimitiveForDecimalType()
     {
       var stringType = 1.2m.GetType();
       TypeExtensions.IsPrimitive(stringType).ShouldBeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnTrueWhenCallIsPrimitiveForDoubleType()
     {
       var stringType = 1.3d.GetType();
       TypeExtensions.IsPrimitive(stringType).ShouldBeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnTrueWhenCallIsPrimitiveForGuidType()
     {
       var guidType = Guid.NewGuid().GetType();
       TypeExtensions.IsPrimitive(guidType).ShouldBeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnTrueWhenCallIsPrimitiveForIntType()
     {
       var stringType = 1.GetType();
       TypeExtensions.IsPrimitive(stringType).ShouldBeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void ReturnTrueWhenCallIsPrimitiveForStringType()
     {
       var stringType = "".GetType();

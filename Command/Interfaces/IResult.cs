@@ -7,6 +7,8 @@ namespace Command
     IList<string> Messages { get; }
 
     Status Status { get; }
+
+    bool WasSuccessful { get; }
   }
 
   public interface IResult<out TValue> : IResult
