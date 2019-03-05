@@ -1,9 +1,9 @@
 ﻿using System;
-using Command.Extensions;
+using CodeBasics.Command.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
-namespace Command.Test.Extensions
+namespace CodeBasics.Command.Test.Extensions
 {
   [TestClass]
   public class TypeExtensionsShould

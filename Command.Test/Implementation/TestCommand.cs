@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Command.Implementation;
+using CodeBasics.Command.Implementation;
 
-namespace Command.Test.Implementation
+namespace CodeBasics.Command.Test.Implementation
 {
   public class TestCommand : CommandInOutAsyncBase<int, int>
   {

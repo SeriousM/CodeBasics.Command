@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>CodeBasics.Command</id>
+    <version>$version$</version>
+    <title>CodeBasics.Command</title>
+    <authors>Bernhard Millauer, Julien Vandenbussche</authors>
+    <owners>SeriousM</owners>
+    <tags>command pattern .net standard</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <!-- <licenseUrl>https://github.com/envkey/envkey-dotnet/blob/master/LICENCE.txt</licenseUrl> -->
+    <projectUrl>https://github.com/SeriousM/command</projectUrl>
+    <repository type="git" url="https://github.com/SeriousM/command" branch="master" />
+    <description>Base classes for commands and input/output validations</description>
+    <dependencies>
+      <group>
+        <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="2.2.0" />
+        <dependency id="Microsoft.Extensions.Logging" version="2.2.0" />
+        <dependency id="System.ComponentModel.Annotations" version="4.5.0" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\Command\bin\Release\netstandard2.0\CodeBasics.Command.dll" target="lib\netstandard2.0\CodeBasics.Command.dll" />
+  </files>
+</package>

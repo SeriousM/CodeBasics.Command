@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Command.Extensions
+namespace CodeBasics.Command.Extensions
 {
   internal static class TypeExtensions
   {

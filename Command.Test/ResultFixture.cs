@@ -1,8 +1,8 @@
-﻿using Command.Implementation;
+﻿using CodeBasics.Command.Implementation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
-namespace Command.Test
+namespace CodeBasics.Command.Test
 {
   [TestClass]
   public class ResultFixture

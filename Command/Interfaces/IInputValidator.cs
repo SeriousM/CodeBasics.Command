@@ -1,4 +1,4 @@
-﻿namespace Command
+﻿namespace CodeBasics.Command
 {
   public interface IInputValidator<in T>
   {

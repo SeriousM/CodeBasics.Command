@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Command.Implementation
+namespace CodeBasics.Command.Implementation
 {
   public abstract class CommandInOutAsyncBase<TIn, TOut> : ICommandInOutAsync<TOut>, ICommandSetInput<TIn>
   {

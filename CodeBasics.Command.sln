@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Command", "Command\Command.csproj", "{450CC36C-D179-44C5-8776-ACFF7DBB26A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeBasics.Command", "Command\CodeBasics.Command.csproj", "{450CC36C-D179-44C5-8776-ACFF7DBB26A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Command.Test", "Command.Test\Command.Test.csproj", "{0081A3FC-C439-4E77-8D4B-5CC90D666D4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeBasics.Command.Test", "Command.Test\CodeBasics.Command.Test.csproj", "{0081A3FC-C439-4E77-8D4B-5CC90D666D4E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

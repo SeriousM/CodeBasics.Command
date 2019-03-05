@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Command
+namespace CodeBasics.Command
 {
   public interface ICommandInOutAsync<TOut>
   {

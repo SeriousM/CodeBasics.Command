@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Command
+namespace CodeBasics.Command
 {
   public interface IResult
   {

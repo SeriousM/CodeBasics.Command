@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Command.Implementation;
+using CodeBasics.Command.Implementation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
 
-namespace Command.Test.Implementation
+namespace CodeBasics.Command.Test.Implementation
 {
   [TestClass]
   public class DataAnnotationsValidatorFixture

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Command.Implementation
+namespace CodeBasics.Command.Implementation
 {
   internal class CommandFactory : ICommandFactory
   {

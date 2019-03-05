@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Command.Extensions;
+using CodeBasics.Command.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace Command.Implementation
+namespace CodeBasics.Command.Implementation
 {
   public class DataAnnotationsValidator<T> : IInputValidator<T>, IOutputValidator<T>
   {

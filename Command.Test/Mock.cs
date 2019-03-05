@@ -1,7 +1,7 @@
 ﻿using System;
 using Moq;
 
-namespace Command.Test
+namespace CodeBasics.Command.Test
 {
   internal static class Mock
   {

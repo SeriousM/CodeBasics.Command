@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Command.Test.Implementation
+namespace CodeBasics.Command.Test.Implementation
 {
   [TestClass]
   public class CommandFactoryFixture

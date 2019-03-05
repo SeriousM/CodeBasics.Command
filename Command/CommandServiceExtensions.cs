@@ -1,7 +1,7 @@
-﻿using Command.Implementation;
+﻿using CodeBasics.Command.Implementation;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Command
+namespace CodeBasics.Command
 {
   public static class CommandServiceExtensions
   {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Command.Implementation
+namespace CodeBasics.Command.Implementation
 {
   public sealed class Result<TValue> : IResult<TValue>
   {
