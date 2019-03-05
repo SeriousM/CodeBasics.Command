@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Command.Implementation
 {
-  class CommandFactory : ICommandFactory
+  internal class CommandFactory : ICommandFactory
   {
     private readonly IServiceProvider services;
 

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 using Command.Implementation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
@@ -12,12 +10,12 @@ using Shouldly;
 namespace Command.Test.Implementation
 {
   [TestClass]
-  public class ValidatorShould
+  public class DataAnnotationsValidatorFixture
   {
     [TestMethod]
     public void LogErrorWhenValueIsRefTypeAndNull()
     {
-      var logger = new Mock<ILogger<Validator<List<int>>>>();
+      var logger = new Mock<ILogger<DataAnnotationsValidator<List<int>>>>();
 
       logger.Setup(
         l => l.Log(
@@ -26,7 +24,7 @@ namespace Command.Test.Implementation
           new FormattedLogValues("The value can not be null.", null),
           null,
           It.IsAny<Func<object, Exception, string>>())).Verifiable();
-      var validator = new Validator<List<int>>(logger.Object);
+      var validator = new DataAnnotationsValidator<List<int>>(logger.Object);
 
       validator.Validate(null);
 
@@ -34,23 +32,17 @@ namespace Command.Test.Implementation
     }
 
     [TestMethod]
-    public void LogInformationWhenDataAnnotationOnValueIsNotValid()
+    public void LogErrorWhenDataAnnotationOnValueIsNotValid()
     {
-      ValidationAttribute attribute = new RequiredAttribute();
-      var propertyInfo = attribute.GetType().GetProperty(
-        "ErrorMessageString",
-        BindingFlags.Instance | BindingFlags.NonPublic);
-      var expectedMessage = propertyInfo.GetValue(attribute) as string;
-
-      var logger = new Mock<ILogger<Validator<SampleModel>>>();
+      var logger = new Mock<ILogger<DataAnnotationsValidator<SampleModel>>>();
       logger.Setup(
         l => l.Log(
-          LogLevel.Information,
+          LogLevel.Error,
           0,
-          new FormattedLogValues(string.Format(expectedMessage, "Name"), null),
+          It.IsAny<object>(),
           null,
           It.IsAny<Func<object, Exception, string>>())).Verifiable();
-      var validator = new Validator<SampleModel>(logger.Object);
+      var validator = new DataAnnotationsValidator<SampleModel>(logger.Object);
 
       validator.Validate(
         new SampleModel
@@ -62,10 +54,32 @@ namespace Command.Test.Implementation
     }
 
     [TestMethod]
+    public void LogDebugWhenDataAnnotationOnValueIsValid()
+    {
+      var logger = new Mock<ILogger<DataAnnotationsValidator<SampleModel>>>();
+      logger.Setup(
+        l => l.Log(
+          LogLevel.Debug,
+          0,
+          It.IsAny<object>(),
+          null,
+          It.IsAny<Func<object, Exception, string>>())).Verifiable();
+      var validator = new DataAnnotationsValidator<SampleModel>(logger.Object);
+
+      validator.Validate(
+        new SampleModel
+        {
+          Name = "Bob"
+        });
+
+      logger.Verify();
+    }
+
+    [TestMethod]
     public void ReturnFalseWhenDataAnnotationOnValueIsNotValid()
     {
-      var logger = new Mock<ILogger<Validator<SampleModel>>>();
-      var validator = new Validator<SampleModel>(logger.Object);
+      var logger = new Mock<ILogger<DataAnnotationsValidator<SampleModel>>>();
+      var validator = new DataAnnotationsValidator<SampleModel>(logger.Object);
 
       var valid = validator.Validate(
         new SampleModel
@@ -83,8 +97,8 @@ namespace Command.Test.Implementation
       {
         Name = "correct Value"
       };
-      var logger = new Mock<ILogger<Validator<SampleModel>>>();
-      var validator = Mock.CreateInstanceOf<Validator<SampleModel>>(
+      var logger = new Mock<ILogger<DataAnnotationsValidator<SampleModel>>>();
+      var validator = Mock.CreateInstanceOf<DataAnnotationsValidator<SampleModel>>(
         m => m.Setup(v => v.OnValidate(sampleModel)).Returns(false),
         logger.Object);
 
@@ -97,8 +111,8 @@ namespace Command.Test.Implementation
     [TestMethod]
     public void ReturnFalseWhenValueIsRefTypeAndNull()
     {
-      var logger = new Mock<ILogger<Validator<List<int>>>>();
-      var validator = new Validator<List<int>>(logger.Object);
+      var logger = new Mock<ILogger<DataAnnotationsValidator<List<int>>>>();
+      var validator = new DataAnnotationsValidator<List<int>>(logger.Object);
 
       var valid = validator.Validate(null);
 
@@ -108,8 +122,8 @@ namespace Command.Test.Implementation
     [TestMethod]
     public void ReturnTrueWhenDataAnnotationOnValueIsValid()
     {
-      var logger = new Mock<ILogger<Validator<SampleModel>>>();
-      var validator = new Validator<SampleModel>(logger.Object);
+      var logger = new Mock<ILogger<DataAnnotationsValidator<SampleModel>>>();
+      var validator = new DataAnnotationsValidator<SampleModel>(logger.Object);
 
       var valid = validator.Validate(
         new SampleModel
@@ -123,7 +137,7 @@ namespace Command.Test.Implementation
     [TestMethod]
     public void ReturnTrueWhenValueIsByRefAndNotNull()
     {
-      var validator = new Validator<List<int>>(It.IsAny<ILogger<Validator<List<int>>>>());
+      var validator = new DataAnnotationsValidator<List<int>>(Moq.Mock.Of<ILogger<DataAnnotationsValidator<List<int>>>>());
 
       var valid = validator.Validate(new List<int>());
 
@@ -133,9 +147,9 @@ namespace Command.Test.Implementation
     [TestMethod]
     public void ReturnTrueWhenValueIsPrimitiveType()
     {
-      var validator = new Validator<string>(It.IsAny<ILogger<Validator<string>>>());
+      var validator = new DataAnnotationsValidator<string>(Moq.Mock.Of<ILogger<DataAnnotationsValidator<string>>>());
 
-      var valid = validator.Validate(It.IsAny<string>());
+      var valid = validator.Validate(null);
 
       valid.ShouldBeTrue();
     }
@@ -143,7 +157,7 @@ namespace Command.Test.Implementation
     [TestMethod]
     public void ReturnTrueWhenValueNullableType()
     {
-      var validator = new Validator<int?>(It.IsAny<ILogger<Validator<int?>>>());
+      var validator = new DataAnnotationsValidator<int?>(Moq.Mock.Of<ILogger<DataAnnotationsValidator<int?>>>());
 
       var valid = validator.Validate(null);
 

@@ -8,7 +8,7 @@
 //namespace Command.Test.Implementation
 //{
 //  [TestClass]
-//  public class CommandInOutAsyncShould
+//  public class CommandInOutAsyncFixture
 //  {
 //    private const bool isNotValid = false;
 
@@ -112,3 +112,5 @@
 //    }
 //  }
 //}
+
+

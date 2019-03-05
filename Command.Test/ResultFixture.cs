@@ -5,19 +5,19 @@ using Shouldly;
 namespace Command.Test
 {
   [TestClass]
-  public class ResultShould
+  public class ResultFixture
   {
     [TestMethod]
     public void ReturnFailStatusWhenResultIsConstruct()
     {
-      var result = Result<object>.ExecutionFail("failed");
-      result.Status.ShouldBe(Status.Fail);
+      var result = Result<object>.PostValidationFail("failed");
+      result.Status.ShouldBe(Status.PostValidationFalied);
     }
 
     [TestMethod]
     public void ReturnInstanceOfMessagesWhenResultIsConstruct()
     {
-      var result = Result<object>.ExecutionFail("failed");
+      var result = Result<object>.PreValidationFail("failed");
       result.Messages.ShouldNotBeNull();
     }
   }

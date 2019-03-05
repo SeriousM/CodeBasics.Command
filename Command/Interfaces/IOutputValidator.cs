@@ -1,6 +1,6 @@
 ﻿namespace Command
 {
-  public interface IValidator<in T>
+  public interface IOutputValidator<in T>
   {
     bool Validate(T value);
   }

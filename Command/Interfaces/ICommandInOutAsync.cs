@@ -6,9 +6,4 @@ namespace Command
   {
     Task<IResult<TOut>> ExecuteAsync();
   }
-
-  internal interface ICommandSetInput<in TIn>
-  {
-    void SetInputParameter(TIn input);
-  }
 }
