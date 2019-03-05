@@ -1,5 +1,6 @@
 ﻿using CodeBasics.Command.Implementation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace CodeBasics.Command
 {
@@ -7,9 +8,9 @@ namespace CodeBasics.Command
   {
     public static IServiceCollection AddCommands(this IServiceCollection services)
     {
-      services.AddSingleton<ICommandFactory, CommandFactory>();
-      services.AddSingleton(typeof(IInputValidator<>), typeof(DataAnnotationsValidator<>));
-      services.AddSingleton(typeof(IOutputValidator<>), typeof(DataAnnotationsValidator<>));
+      services.TryAddSingleton<ICommandFactory, CommandFactory>();
+      services.TryAddSingleton(typeof(IInputValidator<>), typeof(DataAnnotationsValidator<>));
+      services.TryAddSingleton(typeof(IOutputValidator<>), typeof(DataAnnotationsValidator<>));
 
       services.AddLogging();
 
