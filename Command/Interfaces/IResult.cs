@@ -6,7 +6,7 @@ namespace CodeBasics.Command
   {
     IList<string> Messages { get; }
 
-    Status Status { get; }
+    CommandExecutionStatus Status { get; }
 
     bool WasSuccessful { get; }
   }

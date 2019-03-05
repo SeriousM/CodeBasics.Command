@@ -1,22 +1,36 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace CodeBasics.Command.Implementation
 {
   public abstract class CommandInOutAsyncBase<TIn, TOut> : ICommandInOutAsync<TOut>, ICommandSetInput<TIn>
   {
-    private readonly IInputValidator<TIn> inputValidator;
-    private readonly IOutputValidator<TOut> outputValidator;
+    private readonly ILogger logger;
+    private IInputValidator<TIn> inputValidator;
+    private IOutputValidator<TOut> outputValidator;
     private readonly object syncRoot = new object();
     private bool executed;
     private TIn input;
 
     protected CommandInOutAsyncBase(
+      ILogger logger,
       IInputValidator<TIn> inputValidator,
       IOutputValidator<TOut> outputValidator)
     {
+      this.logger = logger;
       this.inputValidator = inputValidator;
       this.outputValidator = outputValidator;
+    }
+
+    internal void SetInputValidator(IInputValidator<TIn> validator)
+    {
+      inputValidator = validator;
+    }
+
+    internal void SetOutputValidator(IOutputValidator<TOut> validator)
+    {
+      outputValidator = validator;
     }
 
     public async Task<IResult<TOut>> ExecuteAsync()
@@ -31,23 +45,26 @@ namespace CodeBasics.Command.Implementation
         executed = true;
       }
 
-      if (inputValidator != null && !inputValidator.Validate(input))
+      using (logger.BeginScope($"Command Execution: {GetType().FullName}"))
       {
-        return Result<TOut>.PreValidationFail("Pre-Validation failed.");
-      }
-
-      var task = OnExecuteAsync(input) ?? throw new NullReferenceException("The task of OnExecute can not be null.");
-      var result = await task ?? throw new NullReferenceException("The result of OnExecute can not be null.");
-
-      if (result.Status == Status.Success)
-      {
-        if (outputValidator != null && !outputValidator.Validate(result.Value))
+        if (inputValidator != null && !inputValidator.Validate(input))
         {
-          result = Result<TOut>.PostValidationFail("Post-Validation failed.");
+          return Result<TOut>.PreValidationFail("Pre-Validation failed.");
         }
-      }
 
-      return result;
+        var task = OnExecuteAsync(input) ?? throw new NullReferenceException("The task of OnExecute can not be null.");
+        var result = await task ?? throw new NullReferenceException("The result of OnExecute can not be null.");
+
+        if (result.Status == CommandExecutionStatus.Success)
+        {
+          if (outputValidator != null && !outputValidator.Validate(result.Value))
+          {
+            result = Result<TOut>.PostValidationFail("Post-Validation failed.");
+          }
+        }
+
+        return result;
+      }
     }
 
     public void SetInputParameter(TIn value)

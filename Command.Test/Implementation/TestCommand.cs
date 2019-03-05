@@ -1,11 +1,12 @@
 ﻿using System.Threading.Tasks;
 using CodeBasics.Command.Implementation;
+using Microsoft.Extensions.Logging;
 
 namespace CodeBasics.Command.Test.Implementation
 {
   public class TestCommand : CommandInOutAsyncBase<int, int>
   {
-    public TestCommand(IInputValidator<int> inputValidator, IOutputValidator<int> outputValidator) : base(inputValidator, outputValidator)
+    public TestCommand(ILogger<TestCommand> logger, IInputValidator<int> inputValidator, IOutputValidator<int> outputValidator) : base(logger, inputValidator, outputValidator)
     {
     }
 

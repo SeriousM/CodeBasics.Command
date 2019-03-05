@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CodeBasics.Command.Implementation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -44,6 +45,36 @@ namespace CodeBasics.Command.Test.Implementation
 
       // act / assert
       await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => command.ExecuteAsync());
+    }
+
+    [TestMethod]
+    public async Task InputValidation_fail_should_return_bad_result()
+    {
+      // arrange
+      var command = (TestCommand)CommandFactory.CreateAsync<TestCommand, int, int>(1);
+      command.SetInputValidator(new ActionValidator<int>(_ => false));
+
+      // act
+      var result = await command.ExecuteAsync();
+
+      // assert
+      Assert.IsFalse(result.WasSuccessful);
+      Assert.AreEqual(CommandExecutionStatus.PreValidationFailed, result.Status);
+    }
+
+    [TestMethod]
+    public async Task OutputValidation_fail_should_return_bad_result()
+    {
+      // arrange
+      var command = (TestCommand)CommandFactory.CreateAsync<TestCommand, int, int>(1);
+      command.SetOutputValidator(new ActionValidator<int>(_ => false));
+
+      // act
+      var result = await command.ExecuteAsync();
+
+      // assert
+      Assert.IsFalse(result.WasSuccessful);
+      Assert.AreEqual(CommandExecutionStatus.PostValidationFalied, result.Status);
     }
   }
 }

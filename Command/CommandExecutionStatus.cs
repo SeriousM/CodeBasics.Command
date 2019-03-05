@@ -1,6 +1,6 @@
 ﻿namespace CodeBasics.Command
 {
-  public enum Status
+  public enum CommandExecutionStatus
   {
     /// <summary>
     /// This value indicates that the evaluation of the command result is not properly implemented.

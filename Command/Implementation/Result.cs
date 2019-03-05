@@ -10,25 +10,25 @@ namespace CodeBasics.Command.Implementation
 
     public IList<string> Messages { get; } = new List<string>();
 
-    public Status Status { get; private set; }
+    public CommandExecutionStatus Status { get; private set; }
 
     public TValue Value { get; private set; }
 
-    public bool WasSuccessful => Status == Status.Success;
+    public bool WasSuccessful => Status == CommandExecutionStatus.Success;
 
     internal static IResult<TValue> PreValidationFail(string message)
     {
-      return new Result<TValue> { Messages = { message }, Status = Status.PreValidationFailed };
+      return new Result<TValue> { Messages = { message }, Status = CommandExecutionStatus.PreValidationFailed };
     }
 
     internal static IResult<TValue> PostValidationFail(string message)
     {
-      return new Result<TValue> { Messages = { message }, Status = Status.PostValidationFalied };
+      return new Result<TValue> { Messages = { message }, Status = CommandExecutionStatus.PostValidationFalied };
     }
 
     internal static IResult<TValue> Success(TValue result)
     {
-      return new Result<TValue> { Status = Status.Success, Value = result };
+      return new Result<TValue> { Status = CommandExecutionStatus.Success, Value = result };
     }
   }
 }

@@ -11,7 +11,7 @@ namespace CodeBasics.Command.Test
     public void ReturnFailStatusWhenResultIsConstruct()
     {
       var result = Result<object>.PostValidationFail("failed");
-      result.Status.ShouldBe(Status.PostValidationFalied);
+      result.Status.ShouldBe(CommandExecutionStatus.PostValidationFalied);
     }
 
     [TestMethod]
