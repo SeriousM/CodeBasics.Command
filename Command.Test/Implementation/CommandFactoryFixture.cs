@@ -44,7 +44,7 @@ namespace CodeBasics.Command.Test.Implementation
       await command.ExecuteAsync();
 
       // act / assert
-      await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => command.ExecuteAsync());
+      await Assert.ThrowsExceptionAsync<CommandExecutionException>(() => command.ExecuteAsync());
     }
 
     [TestMethod]

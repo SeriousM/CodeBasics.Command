@@ -1,14 +1,14 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace CodeBasics.Command.Implementation
 {
-  public abstract class CommandInOutAsyncBase<TIn, TOut> : ICommandInOutAsync<TOut>, ICommandSetInput<TIn>, IValidatorSetter<TIn, TOut>
+  public abstract class CommandInOutAsyncBase<TIn, TOut> : ICommandInOutAsync<TOut>, ISetSetCommandInput<TIn>, IValidatorSetter<TIn, TOut>, ISetCommandOptions
   {
     private readonly object syncRoot = new object();
     private bool executed;
     private TIn input;
+    private CommandOptions options;
 
     protected IInputValidator<TIn> InputValidator { get; private set; }
     protected IOutputValidator<TOut> OutputValidator { get; private set; }
@@ -24,15 +24,13 @@ namespace CodeBasics.Command.Implementation
       OutputValidator = outputValidator;
     }
 
-    void IValidatorSetter<TIn, TOut>.SetInputValidator(IInputValidator<TIn> validator)
-    {
-      InputValidator = validator;
-    }
+    void ISetSetCommandInput<TIn>.SetInputParameter(TIn value) => input = value;
 
-    void IValidatorSetter<TIn, TOut>.SetOutputValidator(IOutputValidator<TOut> validator)
-    {
-      OutputValidator = validator;
-    }
+    void ISetCommandOptions.SetCommandOptions(CommandOptions value) => options = value;
+
+    void IValidatorSetter<TIn, TOut>.SetInputValidator(IInputValidator<TIn> validator) => InputValidator = validator;
+
+    void IValidatorSetter<TIn, TOut>.SetOutputValidator(IOutputValidator<TOut> validator) => OutputValidator = validator;
 
     async Task<IResult<TOut>> ICommandInOutAsync<TOut>.ExecuteAsync()
     {
@@ -40,7 +38,7 @@ namespace CodeBasics.Command.Implementation
       {
         if (executed)
         {
-          throw new InvalidOperationException($"The command of type '{GetType().FullName}' was already executed.");
+          throw new CommandExecutionException($"The command of type '{GetType().FullName}' was already executed.");
         }
 
         executed = true;
@@ -50,27 +48,43 @@ namespace CodeBasics.Command.Implementation
       {
         if (InputValidator != null && !InputValidator.Validate(input))
         {
-          return Result<TOut>.PreValidationFail("Pre-Validation failed.");
-        }
+          var preValidationFail = Result<TOut>.PreValidationFail("Pre-Validation failed.");
 
-        var task = OnExecuteAsync(input) ?? throw new NullReferenceException("The task of OnExecute can not be null.");
-        var result = await task ?? throw new NullReferenceException("The result of OnExecute can not be null.");
-
-        if (result.Status == CommandExecutionStatus.Success)
-        {
-          if (OutputValidator != null && !OutputValidator.Validate(result.Value))
+          if (options.ThrowOnPreValidationFail)
           {
-            result = Result<TOut>.PostValidationFail("Post-Validation failed.");
+            throw new CommandExecutionException($"PreValidation failed for command '{GetType().FullName}'") { CommandResult = preValidationFail };
           }
+
+          return preValidationFail;
         }
 
-        return result;
-      }
-    }
+        var task = OnExecuteAsync(input) ?? throw new CommandExecutionException($"The resulting task of {nameof(OnExecuteAsync)} can not be null.");
+        var commandExecutionResult = await task ?? throw new CommandExecutionException($"The result of {nameof(OnExecuteAsync)} can not be null.");
 
-    void ICommandSetInput<TIn>.SetInputParameter(TIn value)
-    {
-      input = value;
+        if (commandExecutionResult.Status != CommandExecutionStatus.Success)
+        {
+          if (options.ThrowOnExecutionError)
+          {
+            throw new CommandExecutionException($"Execution failed for command '{GetType().FullName}'") { CommandResult = commandExecutionResult };
+          }
+
+          return commandExecutionResult;
+        }
+
+        if (OutputValidator != null && !OutputValidator.Validate(commandExecutionResult.Value))
+        {
+          var postValidationFail = Result<TOut>.PostValidationFail("Post-Validation failed.");
+
+          if (options.ThrowOnPostValidationFail)
+          {
+            throw new CommandExecutionException($"PostValidation failed for command '{GetType().FullName}'") { CommandResult = postValidationFail };
+          }
+
+          return postValidationFail;
+        }
+
+        return commandExecutionResult;
+      }
     }
 
     protected internal abstract Task<IResult<TOut>> OnExecuteAsync(TIn input);

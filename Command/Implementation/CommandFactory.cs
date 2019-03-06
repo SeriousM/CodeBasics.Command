@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace CodeBasics.Command.Implementation
 {
@@ -14,14 +15,21 @@ namespace CodeBasics.Command.Implementation
 
     public ICommandInOutAsync<TOut> CreateAsync<TCommand, TIn, TOut>(TIn input) where TCommand : ICommandInOutAsync<TOut>
     {
+      var commandOptions = services.GetRequiredService<IOptions<CommandOptions>>();
       var command = services.GetRequiredService<ICommandInOutAsync<TOut>>();
-      if (command is ICommandSetInput<TIn> cmd)
+
+      if (command is ISetSetCommandInput<TIn> setInputCommand)
       {
-        cmd.SetInputParameter(input);
+        setInputCommand.SetInputParameter(input);
       }
       else
       {
-        throw new ArgumentException($"Command '{typeof(TCommand).FullName}' does not implement '{typeof(ICommandSetInput<TIn>).Name}'. Maybe the wrong type was implemented?");
+        throw new ArgumentException($"Command '{typeof(TCommand).FullName}' does not implement '{typeof(ISetSetCommandInput<TIn>).Name}'. Maybe the wrong input type was implemented?");
+      }
+
+      if (command is ISetCommandOptions setOptionsCommand)
+      {
+        setOptionsCommand.SetCommandOptions(commandOptions.Value);
       }
 
       return command;

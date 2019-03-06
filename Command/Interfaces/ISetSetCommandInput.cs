@@ -1,6 +1,6 @@
 namespace CodeBasics.Command
 {
-  internal interface ICommandSetInput<in TIn>
+  internal interface ISetSetCommandInput<in TIn>
   {
     void SetInputParameter(TIn value);
   }

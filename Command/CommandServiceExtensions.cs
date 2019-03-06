@@ -8,11 +8,14 @@ namespace CodeBasics.Command
   {
     public static IServiceCollection AddCommand(this IServiceCollection services)
     {
+      services.AddLogging();
+      
+      services.AddOptions<CommandOptions>()
+              .Configure(CommandOptions.DefaultSettings);
+
       services.TryAddSingleton<ICommandFactory, CommandFactory>();
       services.TryAddSingleton(typeof(IInputValidator<>), typeof(DataAnnotationsValidator<>));
       services.TryAddSingleton(typeof(IOutputValidator<>), typeof(DataAnnotationsValidator<>));
-
-      services.AddLogging();
 
       return services;
     }
