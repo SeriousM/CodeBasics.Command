@@ -18,8 +18,10 @@ namespace CodeBasics.Command.Test.Implementation
     {
       services = new ServiceCollection()
                 .AddCommand()
-                .AddSingleton<TestCommand>()
-                .BuildServiceProvider();
+                .AddScoped<TestCommand>()
+                .BuildServiceProvider(true)
+                .CreateScope()
+                .ServiceProvider;
     }
 
     [TestMethod]

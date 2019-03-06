@@ -19,7 +19,7 @@ namespace CodeBasics.Command
         optionsBuilder.Configure(configure);
       }
 
-      services.TryAddSingleton<ICommandFactory, CommandFactory>();
+      services.TryAddTransient<ICommandFactory, CommandFactory>();
       services.TryAddSingleton(typeof(IInputValidator<>), typeof(DataAnnotationsValidator<>));
       services.TryAddSingleton(typeof(IOutputValidator<>), typeof(DataAnnotationsValidator<>));
 
