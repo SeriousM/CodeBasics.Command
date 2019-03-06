@@ -2,6 +2,19 @@
 
 namespace CodeBasics.Command.Implementation
 {
+  public static class Result
+  {
+    public static IResult<TValue> Success<TValue>(TValue value)
+    {
+      return Result<TValue>.Success(value);
+    }
+
+    public static IResult<TValue> ExecutionError<TValue>(string message, Exception exception = null)
+    {
+      return Result<TValue>.ExecutionError(message, exception);
+    }
+  }
+
   public sealed class Result<TValue> : IResult<TValue>
   {
     private Result()
@@ -28,12 +41,12 @@ namespace CodeBasics.Command.Implementation
       return new Result<TValue> { Message = message, Status = CommandExecutionStatus.PostValidationFalied };
     }
 
-    public static IResult<TValue> ExecutionError(string message, Exception exception = null)
+    internal static IResult<TValue> ExecutionError(string message, Exception exception)
     {
       return new Result<TValue> { Status = CommandExecutionStatus.ExecutionError, Message = message, Exception = exception };
     }
 
-    public static IResult<TValue> Success(TValue result)
+    internal static IResult<TValue> Success(TValue result)
     {
       return new Result<TValue> { Status = CommandExecutionStatus.Success, Value = result };
     }

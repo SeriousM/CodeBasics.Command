@@ -16,10 +16,10 @@ namespace CodeBasics.Command.Test.Implementation
     {
       if (FailExecution)
       {
-        return Task.FromResult(Result<int>.ExecutionError("I have to stop this execution."));
+        return Task.FromResult(Result.ExecutionError<int>("I have to stop this execution."));
       }
 
-      return Task.FromResult(Result<int>.Success(++input));
+      return Task.FromResult(Result.Success(++input));
     }
   }
 }
