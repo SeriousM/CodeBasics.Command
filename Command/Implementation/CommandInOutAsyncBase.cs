@@ -52,7 +52,7 @@ namespace CodeBasics.Command.Implementation
 
           if (options.ThrowOnPreValidationFail)
           {
-            throw new CommandExecutionException($"PreValidation failed for command '{GetType().FullName}'") { CommandResult = preValidationFail };
+            throw new CommandExecutionException($"PreValidation failed for command '{GetType().FullName}'", preValidationFail.Exception) { CommandResult = preValidationFail };
           }
 
           return preValidationFail;
@@ -65,7 +65,7 @@ namespace CodeBasics.Command.Implementation
         {
           if (options.ThrowOnExecutionError)
           {
-            throw new CommandExecutionException($"Execution failed for command '{GetType().FullName}'") { CommandResult = commandExecutionResult };
+            throw new CommandExecutionException($"Execution failed for command '{GetType().FullName}'", commandExecutionResult.Exception) { CommandResult = commandExecutionResult };
           }
 
           return commandExecutionResult;
@@ -77,7 +77,7 @@ namespace CodeBasics.Command.Implementation
 
           if (options.ThrowOnPostValidationFail)
           {
-            throw new CommandExecutionException($"PostValidation failed for command '{GetType().FullName}'") { CommandResult = postValidationFail };
+            throw new CommandExecutionException($"PostValidation failed for command '{GetType().FullName}'", postValidationFail.Exception) { CommandResult = postValidationFail };
           }
 
           return postValidationFail;
