@@ -17,7 +17,7 @@ namespace CodeBasics.Command.Test.Implementation
     public void TestSetup()
     {
       services = new ServiceCollection()
-                .AddCommands()
+                .AddCommand()
                 .AddSingleton<ICommandInOutAsync<int>, TestCommand>()
                 .BuildServiceProvider();
     }

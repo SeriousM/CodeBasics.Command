@@ -6,19 +6,20 @@ namespace CodeBasics.Command.Implementation
 {
   public abstract class CommandInOutAsyncBase<TIn, TOut> : ICommandInOutAsync<TOut>, ICommandSetInput<TIn>
   {
-    private readonly ILogger logger;
     private IInputValidator<TIn> inputValidator;
     private IOutputValidator<TOut> outputValidator;
     private readonly object syncRoot = new object();
     private bool executed;
     private TIn input;
+    
+    protected ILogger Logger { get; }
 
     protected CommandInOutAsyncBase(
       ILogger logger,
       IInputValidator<TIn> inputValidator,
       IOutputValidator<TOut> outputValidator)
     {
-      this.logger = logger;
+      Logger = logger;
       this.inputValidator = inputValidator;
       this.outputValidator = outputValidator;
     }
@@ -45,7 +46,7 @@ namespace CodeBasics.Command.Implementation
         executed = true;
       }
 
-      using (logger.BeginScope($"Command Execution: {GetType().FullName}"))
+      using (Logger.BeginScope($"Command Execution: {GetType().FullName}"))
       {
         if (inputValidator != null && !inputValidator.Validate(input))
         {
