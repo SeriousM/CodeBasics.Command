@@ -10,10 +10,6 @@ namespace CodeBasics.Command.Implementation
     private TIn input;
     private CommandOptions options;
 
-    protected IInputValidator<TIn> InputValidator { get; private set; }
-    protected IOutputValidator<TOut> OutputValidator { get; private set; }
-    protected ILogger Logger { get; }
-
     protected CommandInOutAsyncBase(
       ILogger logger,
       IInputValidator<TIn> inputValidator,
@@ -24,13 +20,9 @@ namespace CodeBasics.Command.Implementation
       OutputValidator = outputValidator;
     }
 
-    void ISetSetCommandInput<TIn>.SetInputParameter(TIn value) => input = value;
-
-    void ISetCommandOptions.SetCommandOptions(CommandOptions value) => options = value;
-
-    void IValidatorSetter<TIn, TOut>.SetInputValidator(IInputValidator<TIn> validator) => InputValidator = validator;
-
-    void IValidatorSetter<TIn, TOut>.SetOutputValidator(IOutputValidator<TOut> validator) => OutputValidator = validator;
+    protected IInputValidator<TIn> InputValidator { get; private set; }
+    protected IOutputValidator<TOut> OutputValidator { get; private set; }
+    protected ILogger Logger { get; }
 
     async Task<IResult<TOut>> ICommandInOutAsync<TOut>.ExecuteAsync()
     {
@@ -85,6 +77,26 @@ namespace CodeBasics.Command.Implementation
 
         return commandExecutionResult;
       }
+    }
+
+    void ISetCommandOptions.SetCommandOptions(CommandOptions value)
+    {
+      options = value;
+    }
+
+    void ISetSetCommandInput<TIn>.SetInputParameter(TIn value)
+    {
+      input = value;
+    }
+
+    void IValidatorSetter<TIn, TOut>.SetInputValidator(IInputValidator<TIn> validator)
+    {
+      InputValidator = validator;
+    }
+
+    void IValidatorSetter<TIn, TOut>.SetOutputValidator(IOutputValidator<TOut> validator)
+    {
+      OutputValidator = validator;
     }
 
     protected internal abstract Task<IResult<TOut>> OnExecuteAsync(TIn input);

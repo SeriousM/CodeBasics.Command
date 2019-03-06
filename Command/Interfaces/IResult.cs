@@ -5,7 +5,7 @@ namespace CodeBasics.Command
   public interface IResult
   {
     string Message { get; }
-    
+
     Exception Exception { get; }
 
     CommandExecutionStatus Status { get; }

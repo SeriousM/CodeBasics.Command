@@ -6,11 +6,11 @@ namespace CodeBasics.Command.Test.Implementation
 {
   public class TestCommand : CommandInOutAsyncBase<int, int>
   {
-    public bool FailExecution { get; set; }
-
     public TestCommand(ILogger<TestCommand> logger, IInputValidator<int> inputValidator, IOutputValidator<int> outputValidator) : base(logger, inputValidator, outputValidator)
     {
     }
+
+    public bool FailExecution { get; set; }
 
     protected internal override Task<IResult<int>> OnExecuteAsync(int input)
     {

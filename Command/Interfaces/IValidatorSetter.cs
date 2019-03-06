@@ -1,4 +1,4 @@
-namespace CodeBasics.Command.Implementation
+namespace CodeBasics.Command
 {
   internal interface IValidatorSetter<out TIn, out TOut>
   {

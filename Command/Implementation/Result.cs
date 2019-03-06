@@ -22,7 +22,7 @@ namespace CodeBasics.Command.Implementation
     }
 
     public string Message { get; private set; }
-    
+
     public Exception Exception { get; private set; }
 
     public CommandExecutionStatus Status { get; private set; }

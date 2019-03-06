@@ -9,7 +9,7 @@ namespace CodeBasics.Command
     public static IServiceCollection AddCommand(this IServiceCollection services)
     {
       services.AddLogging();
-      
+
       services.AddOptions<CommandOptions>()
               .Configure(CommandOptions.DefaultSettings);
 
