@@ -16,7 +16,7 @@ namespace CodeBasics.Command.Implementation
     public ICommandInOutAsync<TOut> CreateAsync<TCommand, TIn, TOut>(TIn input) where TCommand : ICommandInOutAsync<TOut>
     {
       var commandOptions = services.GetRequiredService<IOptions<CommandOptions>>();
-      var command = services.GetRequiredService<ICommandInOutAsync<TOut>>();
+      var command = services.GetRequiredService<TCommand>();
 
       if (command is ISetSetCommandInput<TIn> setInputCommand)
       {
