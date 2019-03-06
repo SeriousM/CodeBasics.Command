@@ -20,3 +20,5 @@ echo EXIT: No version or api key was entered
 
 :END
 popd
+
+pause
