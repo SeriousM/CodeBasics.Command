@@ -4,14 +4,14 @@ using Microsoft.Extensions.Logging;
 
 namespace CodeBasics.Command.Implementation
 {
-  public abstract class CommandInOutAsyncBase<TIn, TOut> : ICommandInOutAsync<TOut>, ICommandSetInput<TIn>
+  public abstract class CommandInOutAsyncBase<TIn, TOut> : ICommandInOutAsync<TOut>, ICommandSetInput<TIn>, IValidatorSetter<TIn, TOut>
   {
-    private IInputValidator<TIn> inputValidator;
-    private IOutputValidator<TOut> outputValidator;
     private readonly object syncRoot = new object();
     private bool executed;
     private TIn input;
-    
+
+    protected IInputValidator<TIn> InputValidator { get; private set; }
+    protected IOutputValidator<TOut> OutputValidator { get; private set; }
     protected ILogger Logger { get; }
 
     protected CommandInOutAsyncBase(
@@ -20,21 +20,21 @@ namespace CodeBasics.Command.Implementation
       IOutputValidator<TOut> outputValidator)
     {
       Logger = logger;
-      this.inputValidator = inputValidator;
-      this.outputValidator = outputValidator;
+      InputValidator = inputValidator;
+      OutputValidator = outputValidator;
     }
 
-    internal void SetInputValidator(IInputValidator<TIn> validator)
+    void IValidatorSetter<TIn, TOut>.SetInputValidator(IInputValidator<TIn> validator)
     {
-      inputValidator = validator;
+      InputValidator = validator;
     }
 
-    internal void SetOutputValidator(IOutputValidator<TOut> validator)
+    void IValidatorSetter<TIn, TOut>.SetOutputValidator(IOutputValidator<TOut> validator)
     {
-      outputValidator = validator;
+      OutputValidator = validator;
     }
 
-    public async Task<IResult<TOut>> ExecuteAsync()
+    async Task<IResult<TOut>> ICommandInOutAsync<TOut>.ExecuteAsync()
     {
       lock (syncRoot)
       {
@@ -48,7 +48,7 @@ namespace CodeBasics.Command.Implementation
 
       using (Logger.BeginScope($"Command Execution: {GetType().FullName}"))
       {
-        if (inputValidator != null && !inputValidator.Validate(input))
+        if (InputValidator != null && !InputValidator.Validate(input))
         {
           return Result<TOut>.PreValidationFail("Pre-Validation failed.");
         }
@@ -58,7 +58,7 @@ namespace CodeBasics.Command.Implementation
 
         if (result.Status == CommandExecutionStatus.Success)
         {
-          if (outputValidator != null && !outputValidator.Validate(result.Value))
+          if (OutputValidator != null && !OutputValidator.Validate(result.Value))
           {
             result = Result<TOut>.PostValidationFail("Post-Validation failed.");
           }
@@ -68,7 +68,7 @@ namespace CodeBasics.Command.Implementation
       }
     }
 
-    public void SetInputParameter(TIn value)
+    void ICommandSetInput<TIn>.SetInputParameter(TIn value)
     {
       input = value;
     }

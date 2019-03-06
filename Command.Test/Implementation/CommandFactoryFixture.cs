@@ -51,8 +51,8 @@ namespace CodeBasics.Command.Test.Implementation
     public async Task InputValidation_fail_should_return_bad_result()
     {
       // arrange
-      var command = (TestCommand)CommandFactory.CreateAsync<TestCommand, int, int>(1);
-      command.SetInputValidator(new ActionValidator<int>(_ => false));
+      var command = CommandFactory.CreateAsync<TestCommand, int, int>(1);
+      ((IValidatorSetter<int, int>)command).SetInputValidator(new ActionValidator<int>(_ => false));
 
       // act
       var result = await command.ExecuteAsync();
@@ -66,8 +66,8 @@ namespace CodeBasics.Command.Test.Implementation
     public async Task OutputValidation_fail_should_return_bad_result()
     {
       // arrange
-      var command = (TestCommand)CommandFactory.CreateAsync<TestCommand, int, int>(1);
-      command.SetOutputValidator(new ActionValidator<int>(_ => false));
+      var command = CommandFactory.CreateAsync<TestCommand, int, int>(1);
+      ((IValidatorSetter<int, int>)command).SetOutputValidator(new ActionValidator<int>(_ => false));
 
       // act
       var result = await command.ExecuteAsync();
@@ -81,8 +81,8 @@ namespace CodeBasics.Command.Test.Implementation
     public async Task Execution_failed_should_return_bad_result()
     {
       // arrange
-      var command = (TestCommand)CommandFactory.CreateAsync<TestCommand, int, int>(1);
-      command.FailExecution = true;
+      var command = CommandFactory.CreateAsync<TestCommand, int, int>(1);
+      ((TestCommand)command).FailExecution = true;
 
       // act
       var result = await command.ExecuteAsync();
