@@ -76,5 +76,20 @@ namespace CodeBasics.Command.Test.Implementation
       Assert.IsFalse(result.WasSuccessful);
       Assert.AreEqual(CommandExecutionStatus.PostValidationFalied, result.Status);
     }
+
+    [TestMethod]
+    public async Task Execution_failed_should_return_bad_result()
+    {
+      // arrange
+      var command = (TestCommand)CommandFactory.CreateAsync<TestCommand, int, int>(1);
+      command.FailExecution = true;
+
+      // act
+      var result = await command.ExecuteAsync();
+
+      // assert
+      Assert.IsFalse(result.WasSuccessful);
+      Assert.AreEqual(CommandExecutionStatus.ExecutionError, result.Status);
+    }
   }
 }

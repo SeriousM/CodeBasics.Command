@@ -18,7 +18,7 @@ namespace CodeBasics.Command.Test
     public void ReturnInstanceOfMessagesWhenResultIsConstruct()
     {
       var result = Result<object>.PreValidationFail("failed");
-      result.Messages.ShouldNotBeNull();
+      result.Message.ShouldNotBeNull();
     }
   }
 }

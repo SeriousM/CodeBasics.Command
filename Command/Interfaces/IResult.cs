@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace CodeBasics.Command
 {
   public interface IResult
   {
-    IList<string> Messages { get; }
+    string Message { get; }
+    
+    Exception Exception { get; }
 
     CommandExecutionStatus Status { get; }
 

@@ -18,6 +18,11 @@
     PreValidationFailed,
 
     /// <summary>
+    /// The command execution failed because the command implementation encountered an error.
+    /// </summary>
+    ExecutionError,
+
+    /// <summary>
     /// The command was executed but the post validation failed.
     /// Use post validation only if you have though unit tests in place or the command does not persist data.
     /// </summary>

@@ -6,12 +6,19 @@ namespace CodeBasics.Command.Test.Implementation
 {
   public class TestCommand : CommandInOutAsyncBase<int, int>
   {
+    public bool FailExecution { get; set; }
+
     public TestCommand(ILogger<TestCommand> logger, IInputValidator<int> inputValidator, IOutputValidator<int> outputValidator) : base(logger, inputValidator, outputValidator)
     {
     }
 
     protected internal override Task<IResult<int>> OnExecuteAsync(int input)
     {
+      if (FailExecution)
+      {
+        return Task.FromResult(Result<int>.ExecutionError("I have to stop this execution."));
+      }
+
       return Task.FromResult(Result<int>.Success(++input));
     }
   }
