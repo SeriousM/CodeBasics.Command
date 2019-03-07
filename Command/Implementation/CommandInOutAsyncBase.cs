@@ -148,20 +148,26 @@ namespace CodeBasics.Command.Implementation
         }
       }
 
-      if (Options.ThrowOnExecutionError)
+      if (result.Status == CommandExecutionStatus.ExecutionError)
       {
-        var message = $"Execution failed for command '{GetType().FullName}':\n{result.Message}";
-        Logger.LogError(message);
+        if (Options.ThrowOnExecutionError)
+        {
+          var message = $"Execution failed for command '{GetType().FullName}':\n{result.Message}";
+          Logger.LogError(message);
 
-        throw new CommandExecutionException(message, result.Exception) { CommandResult = result };
+          throw new CommandExecutionException(message, result.Exception) { CommandResult = result };
+        }
       }
 
-      if (Options.ThrowOnPostValidationFail)
+      if (result.Status == CommandExecutionStatus.PostValidationFalied)
       {
-        var message = $"PostValidation failed for command '{GetType().FullName}':\n{result.Message}";
-        Logger.LogError(message);
+        if (Options.ThrowOnPostValidationFail)
+        {
+          var message = $"PostValidation failed for command '{GetType().FullName}':\n{result.Message}";
+          Logger.LogError(message);
 
-        throw new CommandExecutionException(message, result.Exception) { CommandResult = result };
+          throw new CommandExecutionException(message, result.Exception) { CommandResult = result };
+        }
       }
     }
 
