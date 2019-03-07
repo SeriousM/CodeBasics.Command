@@ -4,6 +4,8 @@ namespace CodeBasics.Command
 {
   public interface IResult
   {
+    // TODO: add support for "(localized?) consumer error message" or something like that
+
     string Message { get; }
 
     Exception Exception { get; }
