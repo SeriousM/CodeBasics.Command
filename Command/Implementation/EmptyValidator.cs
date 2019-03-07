@@ -8,9 +8,9 @@
 
     public static EmptyValidator<T> Instance { get; } = new EmptyValidator<T>();
 
-    public bool Validate(T value)
+    public ValidationStatus Validate(T value)
     {
-      return true;
+      return new ValidationStatus(true);
     }
   }
 }

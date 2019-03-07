@@ -18,21 +18,23 @@ namespace CodeBasics.Command.Implementation
 
     protected ILogger<DataAnnotationsValidator<T>> Logger { get; }
 
-    public bool Validate(T value)
+    public ValidationStatus Validate(T value)
     {
       var valueType = typeof(T);
+
+      if (value == null)
+      {
+        var message = $"The value of type '{typeof(T)}' cannot be null.";
+        Logger.LogError(message);
+
+        return new ValidationStatus(false, message);
+      }
+
       if (TypeExtensions.IsPrimitive(valueType)
        || valueType.GetTypeInfo().IsGenericType
        && valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
       {
-        return true;
-      }
-
-      if (value == null)
-      {
-        Logger.LogError("The value can not be null.");
-
-        return false;
+        return new ValidationStatus(true, $"Type '{typeof(T)}' is primitive and is considered as valid.");
       }
 
       var validationResults = new List<ValidationResult>();
@@ -44,15 +46,15 @@ namespace CodeBasics.Command.Implementation
         validationResults,
         true);
 
-      reportValidationResult(valid, validationResults.ToArray());
+      var validationReport = reportValidationResult(valid, validationResults.ToArray());
 
       if (!valid)
       {
-        return false;
+        return new ValidationStatus(false, validationReport);
       }
 
       var onValidateResult = OnValidate(value);
-      if (!onValidateResult)
+      if (!onValidateResult.IsValid)
       {
         Logger.LogError($"Validation of '{typeof(T)}' failed in {nameof(OnValidate)} method.");
       }
@@ -60,7 +62,7 @@ namespace CodeBasics.Command.Implementation
       return onValidateResult;
     }
 
-    private void reportValidationResult(bool valid, ValidationResult[] validationResults)
+    private string reportValidationResult(bool valid, ValidationResult[] validationResults)
     {
       var validationReportValid = new List<(string members, string status)>();
       var validationReportInvalid = new List<(string members, string status)>();
@@ -77,6 +79,10 @@ namespace CodeBasics.Command.Implementation
       }
 
       var sb = new StringBuilder();
+      sb.AppendLine(valid
+        ? $"Validation of '{typeof(T)}' succeeded:"
+        : $"Validation of '{typeof(T)}' failed:");
+
       foreach (var (members, status) in validationReportInvalid.Concat(validationReportValid))
       {
         sb.AppendLine($"{members}: {status}");
@@ -90,11 +96,13 @@ namespace CodeBasics.Command.Implementation
       {
         Logger.LogError($"Validation of '{typeof(T)}' failed:\n{sb}");
       }
+
+      return sb.ToString();
     }
 
-    protected internal virtual bool OnValidate(T value)
+    protected internal virtual ValidationStatus OnValidate(T value)
     {
-      return true;
+      return new ValidationStatus(true);
     }
   }
 }

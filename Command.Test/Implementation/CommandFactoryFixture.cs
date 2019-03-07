@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using CodeBasics.Command.Implementation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CodeBasics.Command.Test.Implementation
@@ -18,6 +19,7 @@ namespace CodeBasics.Command.Test.Implementation
     {
       services = new ServiceCollection()
                 .AddCommand()
+                .AddLogging(opts => opts.SetMinimumLevel(LogLevel.Trace).AddConsole())
                 .AddScoped<TestCommand>()
                 .BuildServiceProvider(true)
                 .CreateScope()

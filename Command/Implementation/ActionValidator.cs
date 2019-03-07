@@ -11,9 +11,9 @@ namespace CodeBasics.Command.Implementation
       this.validatorFunc = validatorFunc;
     }
 
-    public bool Validate(T value)
+    public ValidationStatus Validate(T value)
     {
-      return validatorFunc.Invoke(value);
+      return new ValidationStatus(validatorFunc.Invoke(value));
     }
   }
 }
