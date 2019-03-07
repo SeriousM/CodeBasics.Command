@@ -2,7 +2,7 @@
 
 namespace CodeBasics.Command.Implementation
 {
-  public class ActionValidator<T> : IInputValidator<T>, IOutputValidator<T>
+  public class ActionValidator<T> : IValidator<T>, IInputValidator<T>, IOutputValidator<T>
   {
     private readonly Func<T, bool> validatorFunc;
 

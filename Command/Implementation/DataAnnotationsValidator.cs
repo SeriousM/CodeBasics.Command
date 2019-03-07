@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CodeBasics.Command.Implementation
 {
-  public class DataAnnotationsValidator<T> : IInputValidator<T>, IOutputValidator<T>
+  public class DataAnnotationsValidator<T> : IValidator<T>, IInputValidator<T>, IOutputValidator<T>
   {
     public DataAnnotationsValidator(ILogger<DataAnnotationsValidator<T>> logger)
     {

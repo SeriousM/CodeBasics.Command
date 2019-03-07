@@ -1,6 +1,6 @@
 ﻿namespace CodeBasics.Command.Implementation
 {
-  public class EmptyValidator<T> : IInputValidator<T>, IOutputValidator<T>
+  public class EmptyValidator<T> : IValidator<T>, IInputValidator<T>, IOutputValidator<T>
   {
     private EmptyValidator()
     {

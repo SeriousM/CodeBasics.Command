@@ -1,9 +1,6 @@
-﻿using CodeBasics.Command.Implementation;
-
-namespace CodeBasics.Command
+﻿namespace CodeBasics.Command
 {
-  public interface IOutputValidator<in T>
+  public interface IOutputValidator<in T> : IValidator<T>
   {
-    ValidationStatus Validate(T value);
   }
 }
