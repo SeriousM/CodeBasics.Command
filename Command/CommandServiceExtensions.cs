@@ -20,6 +20,7 @@ namespace CodeBasics.Command
       }
 
       services.TryAddTransient<ICommandFactory, CommandFactory>();
+      services.TryAddSingleton(typeof(IValidator<>), typeof(DataAnnotationsValidator<>));
       services.TryAddSingleton(typeof(IInputValidator<>), typeof(DataAnnotationsValidator<>));
       services.TryAddSingleton(typeof(IOutputValidator<>), typeof(DataAnnotationsValidator<>));
 
