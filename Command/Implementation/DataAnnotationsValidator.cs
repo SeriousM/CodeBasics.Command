@@ -46,12 +46,14 @@ namespace CodeBasics.Command.Implementation
         validationResults,
         true);
 
-      var validationReport = reportValidationResult(valid, validationResults.ToArray());
-
       if (!valid)
       {
+        var validationReport = reportValidationResult(validationResults.ToArray());
+
         return new ValidationStatus(false, validationReport);
       }
+
+      Logger.LogDebug($"Validation of '{typeof(T)}' succeeded.");
 
       var onValidateResult = OnValidate(value);
       if (!onValidateResult.IsValid)
@@ -62,42 +64,38 @@ namespace CodeBasics.Command.Implementation
       return onValidateResult;
     }
 
-    private string reportValidationResult(bool valid, ValidationResult[] validationResults)
+    private string reportValidationResult(ValidationResult[] validationResults)
     {
-      var validationReportValid = new List<(string members, string status)>();
       var validationReportInvalid = new List<(string members, string status)>();
       foreach (var validationResult in validationResults)
       {
-        if (validationResult.ErrorMessage is null)
-        {
-          validationReportValid.Add((string.Join(", ", validationResult.MemberNames ?? new[] { "<object>" }), "valid"));
-        }
-        else
-        {
-          validationReportInvalid.Add((string.Join(", ", validationResult.MemberNames ?? new[] { "<object>" }), validationResult.ErrorMessage));
-        }
+        var members = memberNamesOrPaceholder(validationResult.MemberNames);
+
+          validationReportInvalid.Add((members, validationResult.ErrorMessage));
       }
 
       var sb = new StringBuilder();
-      sb.AppendLine(valid
-        ? $"Validation of '{typeof(T)}' succeeded:"
-        : $"Validation of '{typeof(T)}' failed:");
+      sb.AppendLine($"Validation of '{typeof(T)}' failed:");
 
-      foreach (var (members, status) in validationReportInvalid.Concat(validationReportValid))
+      foreach (var (members, status) in validationReportInvalid)
       {
         sb.AppendLine($"{members}: {status}");
       }
 
-      if (valid)
-      {
-        Logger.LogDebug($"Validation of '{typeof(T)}' succeeded:\n{sb}");
-      }
-      else
-      {
-        Logger.LogError($"Validation of '{typeof(T)}' failed:\n{sb}");
-      }
+      Logger.LogError($"Validation of '{typeof(T)}' failed:\n{sb}");
 
       return sb.ToString();
+    }
+
+    private static string memberNamesOrPaceholder(IEnumerable<string> memberNames)
+    {
+      var names = memberNames as string[] ?? memberNames.ToArray();
+      if (names.Length == 0)
+      {
+        return "<object>";
+      }
+
+      return string.Join(", ", names);
     }
 
     protected internal virtual ValidationStatus OnValidate(T value)
