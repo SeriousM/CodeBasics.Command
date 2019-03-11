@@ -2,6 +2,10 @@
 
 set scriptdir=%~dp0
 
+pushd %scriptdir%..\Command.Test\
+dotnet test -v normal
+popd
+
 set /P VERSION=Version to Build (eg. 1.2.4): 
 if "%VERSION%"=="" GOTO ERROR
 
