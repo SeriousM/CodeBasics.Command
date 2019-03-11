@@ -20,6 +20,11 @@ namespace CodeBasics.Command.Implementation
 
       if (command is ISetSetCommandInput<TIn> setInputCommand)
       {
+        if (input == null)
+        {
+          throw new ArgumentNullException($"The input for command '{typeof(TCommand).FullName}' was null.");
+        }
+
         setInputCommand.SetInputParameter(input);
       }
       else
