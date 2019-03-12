@@ -119,5 +119,19 @@ namespace CodeBasics.Command.Test.Implementation
       Assert.IsFalse(exception.CommandResult.WasSuccessful);
       Assert.AreEqual(CommandExecutionStatus.ExecutionError, exception.CommandResult.Status);
     }
+    
+    [TestMethod]
+    public async Task Execution_returns_null_should_throw()
+    {
+      // arrange
+      var command = CommandFactory.CreateAsync<TestCommand, string, int>("1");
+      ((TestCommand)command).ThrowExecution = true;
+
+      // act / assert
+      var exception = await Assert.ThrowsExceptionAsync<CommandExecutionException>(() => command.ExecuteAsync());
+
+      Assert.IsFalse(exception.CommandResult.WasSuccessful);
+      Assert.AreEqual(CommandExecutionStatus.ExecutionError, exception.CommandResult.Status);
+    }
   }
 }

@@ -13,6 +13,7 @@ namespace CodeBasics.Command.Test.Implementation
 
     public bool FailExecution { get; set; }
     public bool ThrowExecution { get; set; }
+    public bool ReturnNull { get; set; }
 
     protected internal override Task<IResult<int>> OnExecuteAsync(string input)
     {
@@ -24,6 +25,11 @@ namespace CodeBasics.Command.Test.Implementation
       if (ThrowExecution)
       {
         throw new InvalidOperationException("This happened on purpose.");
+      }
+
+      if (ReturnNull)
+      {
+        return null;
       }
 
       return Task.FromResult(Result.Success(int.Parse(input) + 1));

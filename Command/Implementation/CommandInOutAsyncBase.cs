@@ -78,7 +78,7 @@ namespace CodeBasics.Command.Implementation
       var preValidationStatus = InputValidator.Validate(input);
       if (!preValidationStatus.IsValid)
       {
-        var preValidationFail = Result<TOut>.PreValidationFail("Pre-Validation failed: " + preValidationStatus.Message);
+        var preValidationFail = Result<TOut>.PreValidationFail("Pre-Validation failed:\n" + preValidationStatus.Message);
 
         return preValidationFail;
       }
@@ -124,7 +124,7 @@ namespace CodeBasics.Command.Implementation
       var postValidationStatus = OutputValidator.Validate(commandExecutionResultValue);
       if (!postValidationStatus.IsValid)
       {
-        var postValidationFail = Result<TOut>.PostValidationFail("Post-Validation failed.");
+        var postValidationFail = Result<TOut>.PostValidationFail("Post-Validation failed:\n" + postValidationStatus.Message);
 
         return postValidationFail;
       }
