@@ -42,25 +42,26 @@ namespace CodeBasics.Command.Implementation
 
       using (Logger.BeginScope($"Command Execution: {GetType().FullName}"))
       {
-        var executeAsync = preValidation();
-        if (!executeAsync.WasSuccessful)
+        var preValidationResult = preValidation();
+        if (!preValidationResult.WasSuccessful)
         {
-          return executeAsync;
+          throwStatusAsExceptionIfEnabled(preValidationResult);
+          return preValidationResult;
         }
 
         var commandExecutionResult = await executeCommand();
         if (!commandExecutionResult.WasSuccessful)
         {
+          throwStatusAsExceptionIfEnabled(commandExecutionResult);
           return commandExecutionResult;
         }
 
-        var result = postValidation(commandExecutionResult.Value);
-        if (!result.WasSuccessful)
+        var postValidationResult = postValidation(commandExecutionResult.Value);
+        if (!postValidationResult.WasSuccessful)
         {
-          return result;
+          throwStatusAsExceptionIfEnabled(postValidationResult);
+          return postValidationResult;
         }
-
-        throwStatusAsExceptionIfEnabled(commandExecutionResult);
 
         return commandExecutionResult;
       }
@@ -89,16 +90,14 @@ namespace CodeBasics.Command.Implementation
 
     private async Task<IResult<TOut>> executeCommand()
     {
-      var task = OnExecuteAsync(input) ?? throw new CommandExecutionException($"The resulting task of {nameof(OnExecuteAsync)} can not be null.");
-
       IResult<TOut> commandExecutionResult;
       try
       {
-        commandExecutionResult = await task;
+        commandExecutionResult = await OnExecuteAsync(input);
       }
       catch (Exception ex)
       {
-        throw new CommandExecutionException($"Execution of command '{GetType().FullName}' resulted in an exception.", ex);
+        throw new CommandExecutionException($"Execution of command '{GetType().FullName}' resulted in an exception.", ex) { CommandResult = Result.ExecutionError<TOut>("Command execution failed because of an occurred exception.", ex) };
       }
 
       if (commandExecutionResult == null)

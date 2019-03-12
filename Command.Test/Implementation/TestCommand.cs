@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CodeBasics.Command.Implementation;
 using Microsoft.Extensions.Logging;
 
@@ -11,12 +12,18 @@ namespace CodeBasics.Command.Test.Implementation
     }
 
     public bool FailExecution { get; set; }
+    public bool ThrowExecution { get; set; }
 
     protected internal override Task<IResult<int>> OnExecuteAsync(string input)
     {
       if (FailExecution)
       {
         return Task.FromResult(Result.ExecutionError<int>("I have to stop this execution."));
+      }
+
+      if (ThrowExecution)
+      {
+        throw new InvalidOperationException("This happened on purpose.");
       }
 
       return Task.FromResult(Result.Success(int.Parse(input) + 1));

@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CodeBasics.Command.Test.Implementation
 {
   [TestClass]
-  public class CommandFactoryFixture
+  public class CommandFixture
   {
     private IServiceProvider services;
 
@@ -104,6 +104,20 @@ namespace CodeBasics.Command.Test.Implementation
       // assert
       Assert.IsFalse(result.WasSuccessful);
       Assert.AreEqual(CommandExecutionStatus.ExecutionError, result.Status);
+    }
+    
+    [TestMethod]
+    public async Task Execution_throws_should_throw()
+    {
+      // arrange
+      var command = CommandFactory.CreateAsync<TestCommand, string, int>("1");
+      ((TestCommand)command).ThrowExecution = true;
+
+      // act / assert
+      var exception = await Assert.ThrowsExceptionAsync<CommandExecutionException>(() => command.ExecuteAsync());
+
+      Assert.IsFalse(exception.CommandResult.WasSuccessful);
+      Assert.AreEqual(CommandExecutionStatus.ExecutionError, exception.CommandResult.Status);
     }
   }
 }
