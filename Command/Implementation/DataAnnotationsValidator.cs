@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -20,8 +21,6 @@ namespace CodeBasics.Command.Implementation
 
     public ValidationStatus Validate(T value)
     {
-      var valueType = typeof(T);
-
       if (value == null)
       {
         var message = $"The value of type '{typeof(T)}' cannot be null.";
@@ -30,11 +29,60 @@ namespace CodeBasics.Command.Implementation
         return new ValidationStatus(false, message);
       }
 
-      if (TypeExtensions.IsPrimitive(valueType)
-       || valueType.GetTypeInfo().IsGenericType
-       && valueType.GetGenericTypeDefinition() == typeof(Nullable<>))
+      if (value is ICollection collection)
       {
-        return new ValidationStatus(true, $"Type '{typeof(T)}' is primitive and is considered as valid.");
+        var failedValidations = new List<ValidationStatus>();
+
+        foreach (var item in collection)
+        {
+          var result = validateItem(item);
+
+          if (!result.IsValid)
+          {
+            failedValidations.Add(result);
+          }
+        }
+
+        if (failedValidations.Any())
+        {
+          return new ValidationStatus(false, $"Following validations for '{typeof(T)}' failed:\n{string.Join("\n", failedValidations.Select(v => v.Message))}");
+        }
+
+        return new ValidationStatus(true);
+      }
+
+      var validationResult = validateItem(value);
+      if (!validationResult.IsValid)
+      {
+        return validationResult;
+      }
+
+      var onValidateResult = OnValidate(value);
+      if (!onValidateResult.IsValid)
+      {
+        Logger.LogError($"Validation of '{typeof(T)}' failed in {nameof(OnValidate)} method.");
+      }
+
+      return onValidateResult;
+    }
+
+    private ValidationStatus validateItem(object value)
+    {
+      if (value == null)
+      {
+        var message = "The item to validate is null.";
+        Logger.LogError(message);
+
+        return new ValidationStatus(false, message);
+      }
+
+      var type = value.GetType();
+
+      if (TypeExtensions.IsPrimitive(type)
+       || type.GetTypeInfo().IsGenericType
+       && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+      {
+        return new ValidationStatus(true, $"Type '{type}' is primitive and is considered as valid.");
       }
 
       var validationResults = new List<ValidationResult>();
@@ -48,23 +96,17 @@ namespace CodeBasics.Command.Implementation
 
       if (!valid)
       {
-        var validationReport = reportValidationResult(validationResults.ToArray());
+        var validationReport = reportValidationResult(type, validationResults.ToArray());
 
         return new ValidationStatus(false, validationReport);
       }
 
-      Logger.LogDebug($"Validation of '{typeof(T)}' succeeded.");
+      Logger.LogDebug($"Validation of '{type}' succeeded.");
 
-      var onValidateResult = OnValidate(value);
-      if (!onValidateResult.IsValid)
-      {
-        Logger.LogError($"Validation of '{typeof(T)}' failed in {nameof(OnValidate)} method.");
-      }
-
-      return onValidateResult;
+      return new ValidationStatus(true);
     }
 
-    private string reportValidationResult(ValidationResult[] validationResults)
+    private string reportValidationResult(Type type, ValidationResult[] validationResults)
     {
       var validationReportInvalid = new List<(string members, string status)>();
       foreach (var validationResult in validationResults)
@@ -75,14 +117,14 @@ namespace CodeBasics.Command.Implementation
       }
 
       var sb = new StringBuilder();
-      sb.AppendLine($"Validation of '{typeof(T)}' failed:");
+      sb.AppendLine($"Validation of '{type}' failed:");
 
       foreach (var (members, status) in validationReportInvalid)
       {
         sb.AppendLine($"{members}: {status}");
       }
 
-      Logger.LogError($"Validation of '{typeof(T)}' failed:\n{sb}");
+      Logger.LogError($"Validation of '{type}' failed:\n{sb}");
 
       return sb.ToString();
     }

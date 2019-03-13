@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using CodeBasics.Command.Implementation;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Internal;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -137,7 +139,7 @@ namespace CodeBasics.Command.Test.Implementation
     [TestMethod]
     public void ReturnTrueWhenValueIsByRefAndNotNull()
     {
-      var validator = new DataAnnotationsValidator<List<int>>(Moq.Mock.Of<ILogger<DataAnnotationsValidator<List<int>>>>());
+      var validator = getValidator<List<int>>();
 
       var valid = validator.Validate(new List<int>());
 
@@ -147,7 +149,7 @@ namespace CodeBasics.Command.Test.Implementation
     [TestMethod]
     public void ReturnTrueWhenValueIsPrimitiveType()
     {
-      var validator = new DataAnnotationsValidator<decimal>(Moq.Mock.Of<ILogger<DataAnnotationsValidator<decimal>>>());
+      var validator = getValidator<decimal>();
 
       var valid = validator.Validate(0);
 
@@ -157,7 +159,7 @@ namespace CodeBasics.Command.Test.Implementation
     [TestMethod]
     public void ReturnTrueWhenValueIsStringTypeWithValue()
     {
-      var validator = new DataAnnotationsValidator<string>(Moq.Mock.Of<ILogger<DataAnnotationsValidator<string>>>());
+      var validator = getValidator<string>();
 
       var valid = validator.Validate("");
 
@@ -167,7 +169,7 @@ namespace CodeBasics.Command.Test.Implementation
     [TestMethod]
     public void ReturnFalseWhenValueIsStringTypeWithoutValue()
     {
-      var validator = new DataAnnotationsValidator<string>(Moq.Mock.Of<ILogger<DataAnnotationsValidator<string>>>());
+      var validator = getValidator<string>();
 
       var valid = validator.Validate(null);
 
@@ -177,7 +179,7 @@ namespace CodeBasics.Command.Test.Implementation
     [TestMethod]
     public void ReturnTrueWhenValueIsNullableTypeWithValue()
     {
-      var validator = new DataAnnotationsValidator<int?>(Moq.Mock.Of<ILogger<DataAnnotationsValidator<int?>>>());
+      var validator = getValidator<int?>();
 
       var valid = validator.Validate(1);
 
@@ -187,11 +189,57 @@ namespace CodeBasics.Command.Test.Implementation
     [TestMethod]
     public void ReturnFalseWhenValueIsNullableTypeWithoutValue()
     {
-      var validator = new DataAnnotationsValidator<int?>(Moq.Mock.Of<ILogger<DataAnnotationsValidator<int?>>>());
+      var validator = getValidator<int?>();
 
       var valid = validator.Validate(null);
 
       valid.IsValid.ShouldBeFalse();
+    }
+
+    [TestMethod]
+    public void Validate_array_with_valid_elements_should_succeed()
+    {
+      // arrange
+      var validator = getValidator<TestDummyRequired[]>();
+      var array = new[] { new TestDummyRequired { Name = "set" } };
+
+      // act
+      var result = validator.Validate(array);
+
+      // assert
+      result.IsValid.ShouldBeTrue();
+    }
+
+    [TestMethod]
+    public void Validate_array_with_invalid_elements_should_fail()
+    {
+      // arrange
+      var validator = getValidator<TestDummyRequired[]>();
+      var array = new[] { new TestDummyRequired { Name = null } };
+
+      // act
+      var result = validator.Validate(array);
+
+      // assert
+      result.IsValid.ShouldBeFalse();
+      result.Message.ShouldContain("Following validations for 'CodeBasics.Command.Test.Implementation.DataAnnotationsValidatorFixture+TestDummyRequired[]' failed:");
+      result.Message.ShouldContain("Validation of 'CodeBasics.Command.Test.Implementation.DataAnnotationsValidatorFixture+TestDummyRequired' failed");
+    }
+
+    private class TestDummyRequired
+    {
+      [Required]
+      public string Name { get; set; }
+    }
+
+    private static DataAnnotationsValidator<T> getValidator<T>()
+    {
+      return new DataAnnotationsValidator<T>(new NullLogger<DataAnnotationsValidator<T>>());
+    }
+
+    private static DataAnnotationsValidator<T[]> getValidatorForArray<T>()
+    {
+      return new DataAnnotationsValidator<T[]>(new NullLogger<DataAnnotationsValidator<T[]>>());
     }
   }
 }
