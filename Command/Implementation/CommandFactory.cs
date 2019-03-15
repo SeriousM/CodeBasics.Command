@@ -13,7 +13,7 @@ namespace CodeBasics.Command.Implementation
       this.services = services;
     }
 
-    public ICommandInOutAsync<TOut> CreateAsync<TCommand, TIn, TOut>(TIn input) where TCommand : ICommandInOutAsync<TOut>
+    public ICommandInOutAsync<TOut> CreateAsync<TCommand, TIn, TOut>(TIn input) where TCommand : CommandInOutAsyncBase<TIn, TOut>
     {
       var commandOptions = services.GetRequiredService<IOptions<CommandOptions>>();
       var command = services.GetRequiredService<TCommand>();
