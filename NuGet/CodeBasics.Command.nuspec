@@ -9,8 +9,8 @@
     <tags>command pattern .net standard</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <!-- <licenseUrl>https://github.com/envkey/envkey-dotnet/blob/master/LICENCE.txt</licenseUrl> -->
-    <projectUrl>https://github.com/SeriousM/command</projectUrl>
-    <repository type="git" url="https://github.com/SeriousM/command" branch="master" />
+    <projectUrl>https://github.com/SeriousM/CodeBasics.Command</projectUrl>
+    <repository type="git" url="https://github.com/SeriousM/CodeBasics.Command.git" branch="master" />
     <description>Base classes for commands and input/output validations</description>
     <dependencies>
       <group>
