@@ -42,21 +42,21 @@ namespace CodeBasics.Command.Implementation
 
       using (Logger.BeginScope($"Command Execution: {GetType().FullName}"))
       {
-        var preValidationResult = preValidation();
+        var preValidationResult = await preValidationAsync();
         if (!preValidationResult.WasSuccessful)
         {
           throwStatusAsExceptionIfEnabled(preValidationResult);
           return preValidationResult;
         }
 
-        var commandExecutionResult = await executeCommand();
+        var commandExecutionResult = await executeCommandAsync();
         if (!commandExecutionResult.WasSuccessful)
         {
           throwStatusAsExceptionIfEnabled(commandExecutionResult);
           return commandExecutionResult;
         }
 
-        var postValidationResult = postValidation(commandExecutionResult.Value);
+        var postValidationResult = await postValidationAsync(commandExecutionResult.Value);
         if (!postValidationResult.WasSuccessful)
         {
           throwStatusAsExceptionIfEnabled(postValidationResult);
@@ -67,7 +67,7 @@ namespace CodeBasics.Command.Implementation
       }
     }
 
-    private IResult<TOut> preValidation()
+    private async Task<IResult<TOut>> preValidationAsync()
     {
       if (InputValidator == null)
       {
@@ -75,7 +75,7 @@ namespace CodeBasics.Command.Implementation
         return Result.Success<TOut>(default);
       }
 
-      var preValidationStatus = InputValidator.Validate(input);
+      var preValidationStatus = await InputValidator.ValidateAsync(input);
       if (!preValidationStatus.IsValid)
       {
         var preValidationFail = Result<TOut>.PreValidationFail("Pre-Validation failed:\n" + preValidationStatus.Message);
@@ -88,7 +88,7 @@ namespace CodeBasics.Command.Implementation
       return Result.Success<TOut>(default);
     }
 
-    private async Task<IResult<TOut>> executeCommand()
+    private async Task<IResult<TOut>> executeCommandAsync()
     {
       IResult<TOut> commandExecutionResult;
       try
@@ -113,7 +113,7 @@ namespace CodeBasics.Command.Implementation
       return commandExecutionResult;
     }
 
-    private IResult<TOut> postValidation(TOut commandExecutionResultValue)
+    private async Task<IResult<TOut>> postValidationAsync(TOut commandExecutionResultValue)
     {
       if (OutputValidator == null)
       {
@@ -121,7 +121,7 @@ namespace CodeBasics.Command.Implementation
         return Result.Success<TOut>(default);
       }
 
-      var postValidationStatus = OutputValidator.Validate(commandExecutionResultValue);
+      var postValidationStatus = await OutputValidator.ValidateAsync(commandExecutionResultValue);
       if (!postValidationStatus.IsValid)
       {
         var postValidationFail = Result<TOut>.PostValidationFail("Post-Validation failed:\n" + postValidationStatus.Message);

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using CodeBasics.Command.Extensions;
 using Microsoft.Extensions.Logging;
 
@@ -19,7 +20,7 @@ namespace CodeBasics.Command.Implementation
 
     protected ILogger<DataAnnotationsValidator<T>> Logger { get; }
 
-    public ValidationStatus Validate(T value)
+    public async Task<ValidationStatus> ValidateAsync(T value)
     {
       if (value == null)
       {

@@ -1,9 +1,10 @@
-﻿using CodeBasics.Command.Implementation;
+﻿using System.Threading.Tasks;
+using CodeBasics.Command.Implementation;
 
 namespace CodeBasics.Command
 {
   public interface IValidator<in T>
   {
-    ValidationStatus Validate(T value);
+    Task<ValidationStatus> ValidateAsync(T value);
   }
 }

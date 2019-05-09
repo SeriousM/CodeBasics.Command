@@ -1,4 +1,6 @@
-﻿namespace CodeBasics.Command.Implementation
+﻿using System.Threading.Tasks;
+
+namespace CodeBasics.Command.Implementation
 {
   public class EmptyValidator<T> : IValidator<T>, IInputValidator<T>, IOutputValidator<T>
   {
@@ -8,9 +10,9 @@
 
     public static EmptyValidator<T> Instance { get; } = new EmptyValidator<T>();
 
-    public ValidationStatus Validate(T value)
+    public Task<ValidationStatus> ValidateAsync(T value)
     {
-      return new ValidationStatus(true);
+      return Task.FromResult(new ValidationStatus(true));
     }
   }
 }

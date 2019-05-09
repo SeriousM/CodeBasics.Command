@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using CodeBasics.Command.Implementation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -15,7 +16,7 @@ namespace CodeBasics.Command.Test.Implementation
   public class DataAnnotationsValidatorFixture
   {
     [TestMethod]
-    public void LogErrorWhenValueIsRefTypeAndNull()
+    public async Task LogErrorWhenValueIsRefTypeAndNull()
     {
       var logger = new Mock<ILogger<DataAnnotationsValidator<List<int>>>>();
 
@@ -28,13 +29,13 @@ namespace CodeBasics.Command.Test.Implementation
           It.IsAny<Func<object, Exception, string>>())).Verifiable();
       var validator = new DataAnnotationsValidator<List<int>>(logger.Object);
 
-      validator.Validate(null);
+      await validator.ValidateAsync(null);
 
       logger.Verify();
     }
 
     [TestMethod]
-    public void LogErrorWhenDataAnnotationOnValueIsNotValid()
+    public async Task LogErrorWhenDataAnnotationOnValueIsNotValid()
     {
       var logger = new Mock<ILogger<DataAnnotationsValidator<SampleModel>>>();
       logger.Setup(
@@ -46,7 +47,7 @@ namespace CodeBasics.Command.Test.Implementation
           It.IsAny<Func<object, Exception, string>>())).Verifiable();
       var validator = new DataAnnotationsValidator<SampleModel>(logger.Object);
 
-      validator.Validate(
+      await validator.ValidateAsync(
         new SampleModel
         {
           Name = string.Empty
@@ -56,7 +57,7 @@ namespace CodeBasics.Command.Test.Implementation
     }
 
     [TestMethod]
-    public void LogDebugWhenDataAnnotationOnValueIsValid()
+    public async Task LogDebugWhenDataAnnotationOnValueIsValid()
     {
       var logger = new Mock<ILogger<DataAnnotationsValidator<SampleModel>>>();
       logger.Setup(
@@ -68,7 +69,7 @@ namespace CodeBasics.Command.Test.Implementation
           It.IsAny<Func<object, Exception, string>>())).Verifiable();
       var validator = new DataAnnotationsValidator<SampleModel>(logger.Object);
 
-      validator.Validate(
+      await validator.ValidateAsync(
         new SampleModel
         {
           Name = "Bob"
@@ -78,12 +79,12 @@ namespace CodeBasics.Command.Test.Implementation
     }
 
     [TestMethod]
-    public void ReturnFalseWhenDataAnnotationOnValueIsNotValid()
+    public async Task ReturnFalseWhenDataAnnotationOnValueIsNotValid()
     {
       var logger = new Mock<ILogger<DataAnnotationsValidator<SampleModel>>>();
       var validator = new DataAnnotationsValidator<SampleModel>(logger.Object);
 
-      var valid = validator.Validate(
+      var valid = await validator.ValidateAsync(
         new SampleModel
         {
           Name = string.Empty
@@ -93,7 +94,7 @@ namespace CodeBasics.Command.Test.Implementation
     }
 
     [TestMethod]
-    public void ReturnFalseWhenDataAnnotationOnValueIsValidButOnValidateReturnFalse()
+    public async Task ReturnFalseWhenDataAnnotationOnValueIsValidButOnValidateReturnFalse()
     {
       var sampleModel = new SampleModel
       {
@@ -104,30 +105,30 @@ namespace CodeBasics.Command.Test.Implementation
         m => m.Setup(v => v.OnValidate(sampleModel)).Returns(new ValidationStatus(false)),
         logger.Object);
 
-      var valid = validator.Validate(
+      var valid = await validator.ValidateAsync(
         sampleModel);
 
       valid.IsValid.ShouldBeFalse();
     }
 
     [TestMethod]
-    public void ReturnFalseWhenValueIsRefTypeAndNull()
+    public async Task ReturnFalseWhenValueIsRefTypeAndNull()
     {
       var logger = new Mock<ILogger<DataAnnotationsValidator<List<int>>>>();
       var validator = new DataAnnotationsValidator<List<int>>(logger.Object);
 
-      var valid = validator.Validate(null);
+      var valid = await validator.ValidateAsync(null);
 
       valid.IsValid.ShouldBeFalse();
     }
 
     [TestMethod]
-    public void ReturnTrueWhenDataAnnotationOnValueIsValid()
+    public async Task ReturnTrueWhenDataAnnotationOnValueIsValid()
     {
       var logger = new Mock<ILogger<DataAnnotationsValidator<SampleModel>>>();
       var validator = new DataAnnotationsValidator<SampleModel>(logger.Object);
 
-      var valid = validator.Validate(
+      var valid = await validator.ValidateAsync(
         new SampleModel
         {
           Name = "correct value"
@@ -137,88 +138,88 @@ namespace CodeBasics.Command.Test.Implementation
     }
 
     [TestMethod]
-    public void ReturnTrueWhenValueIsByRefAndNotNull()
+    public async Task ReturnTrueWhenValueIsByRefAndNotNull()
     {
       var validator = getValidator<List<int>>();
 
-      var valid = validator.Validate(new List<int>());
+      var valid = await validator.ValidateAsync(new List<int>());
 
       valid.IsValid.ShouldBeTrue();
     }
 
     [TestMethod]
-    public void ReturnTrueWhenValueIsPrimitiveType()
+    public async Task ReturnTrueWhenValueIsPrimitiveType()
     {
       var validator = getValidator<decimal>();
 
-      var valid = validator.Validate(0);
+      var valid = await validator.ValidateAsync(0);
 
       valid.IsValid.ShouldBeTrue();
     }
 
     [TestMethod]
-    public void ReturnTrueWhenValueIsStringTypeWithValue()
+    public async Task ReturnTrueWhenValueIsStringTypeWithValue()
     {
       var validator = getValidator<string>();
 
-      var valid = validator.Validate("");
+      var valid = await validator.ValidateAsync("");
 
       valid.IsValid.ShouldBeTrue();
     }
 
     [TestMethod]
-    public void ReturnFalseWhenValueIsStringTypeWithoutValue()
+    public async Task ReturnFalseWhenValueIsStringTypeWithoutValue()
     {
       var validator = getValidator<string>();
 
-      var valid = validator.Validate(null);
+      var valid = await validator.ValidateAsync(null);
 
       valid.IsValid.ShouldBeFalse();
     }
 
     [TestMethod]
-    public void ReturnTrueWhenValueIsNullableTypeWithValue()
+    public async Task ReturnTrueWhenValueIsNullableTypeWithValue()
     {
       var validator = getValidator<int?>();
 
-      var valid = validator.Validate(1);
+      var valid = await validator.ValidateAsync(1);
 
       valid.IsValid.ShouldBeTrue();
     }
 
     [TestMethod]
-    public void ReturnFalseWhenValueIsNullableTypeWithoutValue()
+    public async Task ReturnFalseWhenValueIsNullableTypeWithoutValue()
     {
       var validator = getValidator<int?>();
 
-      var valid = validator.Validate(null);
+      var valid = await validator.ValidateAsync(null);
 
       valid.IsValid.ShouldBeFalse();
     }
 
     [TestMethod]
-    public void Validate_array_with_valid_elements_should_succeed()
+    public async Task Validate_array_with_valid_elements_should_succeed()
     {
       // arrange
       var validator = getValidator<TestDummyRequired[]>();
       var array = new[] { new TestDummyRequired { Name = "set" } };
 
       // act
-      var result = validator.Validate(array);
+      var result = await validator.ValidateAsync(array);
 
       // assert
       result.IsValid.ShouldBeTrue();
     }
 
     [TestMethod]
-    public void Validate_array_with_invalid_elements_should_fail()
+    public async Task Validate_array_with_invalid_elements_should_fail()
     {
       // arrange
       var validator = getValidator<TestDummyRequired[]>();
       var array = new[] { new TestDummyRequired { Name = null } };
 
       // act
-      var result = validator.Validate(array);
+      var result = await validator.ValidateAsync(array);
 
       // assert
       result.IsValid.ShouldBeFalse();
