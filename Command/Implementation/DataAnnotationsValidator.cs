@@ -49,7 +49,7 @@ namespace CodeBasics.Command.Implementation
           return new ValidationStatus(false, $"Following validations for '{typeof(T)}' failed:\n{string.Join("\n", failedValidations.Select(v => v.Message))}");
         }
 
-        return new ValidationStatus(true);
+        return ValidationStatus.Valid;
       }
 
       var validationResult = validateItem(value);
@@ -104,7 +104,7 @@ namespace CodeBasics.Command.Implementation
 
       Logger.LogDebug($"Validation of '{type}' succeeded.");
 
-      return new ValidationStatus(true);
+      return ValidationStatus.Valid;
     }
 
     private string reportValidationResult(Type type, ValidationResult[] validationResults)
@@ -112,7 +112,7 @@ namespace CodeBasics.Command.Implementation
       var validationReportInvalid = new List<(string members, string status)>();
       foreach (var validationResult in validationResults)
       {
-        var members = memberNamesOrPaceholder(validationResult.MemberNames);
+        var members = memberNamesOrPlaceholder(validationResult.MemberNames);
 
           validationReportInvalid.Add((members, validationResult.ErrorMessage));
       }
@@ -130,7 +130,7 @@ namespace CodeBasics.Command.Implementation
       return sb.ToString();
     }
 
-    private static string memberNamesOrPaceholder(IEnumerable<string> memberNames)
+    private static string memberNamesOrPlaceholder(IEnumerable<string> memberNames)
     {
       var names = memberNames as string[] ?? memberNames.ToArray();
       if (names.Length == 0)
@@ -143,7 +143,7 @@ namespace CodeBasics.Command.Implementation
 
     protected internal virtual ValidationStatus OnValidate(T value)
     {
-      return new ValidationStatus(true);
+      return ValidationStatus.Valid;
     }
   }
 }

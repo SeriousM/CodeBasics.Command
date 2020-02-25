@@ -12,7 +12,7 @@ namespace CodeBasics.Command.Implementation
 
     public Task<ValidationStatus> ValidateAsync(T value)
     {
-      return Task.FromResult(new ValidationStatus(true));
+      return Task.FromResult(ValidationStatus.Valid);
     }
   }
 }

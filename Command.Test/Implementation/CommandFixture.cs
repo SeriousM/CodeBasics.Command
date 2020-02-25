@@ -20,7 +20,10 @@ namespace CodeBasics.Command.Test.Implementation
       services = new ServiceCollection()
                 .AddCommand()
                 .AddLogging(opts => opts.SetMinimumLevel(LogLevel.Trace).AddConsole())
+                
                 .AddScoped<TestCommand>()
+                .AddScoped<TestWithSelfValidationCommand>()
+                
                 .BuildServiceProvider(true)
                 .CreateScope()
                 .ServiceProvider;
@@ -132,6 +135,23 @@ namespace CodeBasics.Command.Test.Implementation
 
       Assert.IsFalse(exception.CommandResult.WasSuccessful);
       Assert.AreEqual(CommandExecutionStatus.ExecutionError, exception.CommandResult.Status);
+    }
+    
+    [TestMethod]
+    public async Task SelfValidatingCommand_Execution_calls_input_and_output_validator()
+    {
+      // arrange
+      var command = CommandFactory.CreateAsync<TestWithSelfValidationCommand, string, int>("1");
+      var concreteCommand = (TestWithSelfValidationCommand)command;
+      concreteCommand.IncrementValue = 23;
+
+      // act
+      var result = await command.ExecuteAsync();
+
+      // assert
+      Assert.AreEqual(24, concreteCommand.InputValidatorCalled);
+      Assert.AreEqual(25, result.Value);
+      Assert.AreEqual(26, concreteCommand.OutputValidatorCalled);
     }
   }
 }

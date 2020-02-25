@@ -22,8 +22,16 @@ namespace CodeBasics.Command.Implementation
 
     protected ILogger Logger { get; }
     protected internal CommandOptions Options { get; private set; }
-    protected IInputValidator<TIn> InputValidator { get; private set; }
-    protected IOutputValidator<TOut> OutputValidator { get; private set; }
+    
+    /// <summary>
+    /// The input validator. Can be overwritten in case the command itself wants to validate.
+    /// </summary>
+    protected IInputValidator<TIn> InputValidator { get; set; }
+    
+    /// <summary>
+    /// The output validator. Can be overwritten in case the command itself wants to validate.
+    /// </summary>
+    protected IOutputValidator<TOut> OutputValidator { get; set; }
 
     async Task<IResult<TOut>> ICommandInOutAsync<TOut>.ExecuteAsync()
     {

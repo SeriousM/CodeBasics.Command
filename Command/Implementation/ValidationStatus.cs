@@ -10,5 +10,7 @@
       IsValid = isValid;
       Message = message;
     }
+
+    public static readonly ValidationStatus Valid = new ValidationStatus(true);
   }
 }
