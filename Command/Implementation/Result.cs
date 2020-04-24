@@ -33,12 +33,22 @@ namespace CodeBasics.Command.Implementation
 
     internal static IResult<TValue> PreValidationFail(string message)
     {
-      return new Result<TValue> { Message = message, Status = CommandExecutionStatus.PreValidationFailed };
+      return PreValidationFail(message, null);
+    }
+
+    internal static IResult<TValue> PreValidationFail(string message, Exception ex)
+    {
+      return new Result<TValue> { Message = message, Status = CommandExecutionStatus.PreValidationFailed, Exception = ex };
     }
 
     internal static IResult<TValue> PostValidationFail(string message)
     {
-      return new Result<TValue> { Message = message, Status = CommandExecutionStatus.PostValidationFalied };
+      return PostValidationFail(message, null);
+    }
+
+    internal static IResult<TValue> PostValidationFail(string message, Exception ex)
+    {
+      return new Result<TValue> { Message = message, Status = CommandExecutionStatus.PostValidationFalied, Exception = ex };
     }
 
     internal static IResult<TValue> ExecutionError(string message, Exception exception)

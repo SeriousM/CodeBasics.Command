@@ -83,17 +83,26 @@ namespace CodeBasics.Command.Implementation
         return Result.Success<TOut>(default);
       }
 
-      var preValidationStatus = await InputValidator.ValidateAsync(input);
-      if (!preValidationStatus.IsValid)
+      try
       {
-        var preValidationFail = Result<TOut>.PreValidationFail("Pre-Validation failed:\n" + preValidationStatus.Message);
+        var preValidationStatus = await InputValidator.ValidateAsync(input);
+        if (!preValidationStatus.IsValid)
+        {
+          var preValidationFail = Result<TOut>.PreValidationFail($"Pre-Validation failed:\n{preValidationStatus.Message}");
+
+          return preValidationFail;
+        }
+
+        Logger.LogDebug($"Pre-Validation of command '{GetType().FullName}' was successful.");
+
+        return Result.Success<TOut>(default);
+      }
+      catch (Exception ex)
+      {
+        var preValidationFail = Result<TOut>.PreValidationFail("Pre-Validation resulted in an exception.", ex);
 
         return preValidationFail;
       }
-
-      Logger.LogDebug($"Pre-Validation of command '{GetType().FullName}' was successful.");
-
-      return Result.Success<TOut>(default);
     }
 
     private async Task<IResult<TOut>> executeCommandAsync()
@@ -105,7 +114,7 @@ namespace CodeBasics.Command.Implementation
       }
       catch (Exception ex)
       {
-        throw new CommandExecutionException($"Execution of command '{GetType().FullName}' resulted in an exception.", ex) { CommandResult = Result.ExecutionError<TOut>("Command execution failed because of an occurred exception.", ex) };
+        commandExecutionResult = Result.ExecutionError<TOut>("Execution resulted in an exception.", ex);
       }
 
       if (commandExecutionResult == null)
@@ -129,17 +138,26 @@ namespace CodeBasics.Command.Implementation
         return Result.Success<TOut>(default);
       }
 
-      var postValidationStatus = await OutputValidator.ValidateAsync(commandExecutionResultValue);
-      if (!postValidationStatus.IsValid)
+      try
       {
-        var postValidationFail = Result<TOut>.PostValidationFail("Post-Validation failed:\n" + postValidationStatus.Message);
+        var postValidationStatus = await OutputValidator.ValidateAsync(commandExecutionResultValue);
+        if (!postValidationStatus.IsValid)
+        {
+          var postValidationFail = Result<TOut>.PostValidationFail($"Post-Validation failed:\n{postValidationStatus.Message}");
+
+          return postValidationFail;
+        }
+
+        Logger.LogDebug($"Post-Validation of command '{GetType().FullName}' was successful.");
+
+        return Result.Success<TOut>(default);
+      }
+      catch (Exception ex)
+      {
+        var postValidationFail = Result<TOut>.PostValidationFail("Post-Validation resulted in an exception.", ex);
 
         return postValidationFail;
       }
-
-      Logger.LogDebug($"Post-Validation of command '{GetType().FullName}' was successful.");
-
-      return Result.Success<TOut>(default);
     }
 
     private void throwStatusAsExceptionIfEnabled(IResult result)

@@ -110,31 +110,31 @@ namespace CodeBasics.Command.Test.Implementation
     }
     
     [TestMethod]
-    public async Task Execution_throws_should_throw()
+    public async Task Execution_throws_should_return_bad_result()
     {
       // arrange
       var command = CommandFactory.CreateAsync<TestCommand, string, int>("1");
       ((TestCommand)command).ThrowExecution = true;
 
       // act / assert
-      var exception = await Assert.ThrowsExceptionAsync<CommandExecutionException>(() => command.ExecuteAsync());
+      var result = await command.ExecuteAsync();
 
-      Assert.IsFalse(exception.CommandResult.WasSuccessful);
-      Assert.AreEqual(CommandExecutionStatus.ExecutionError, exception.CommandResult.Status);
+      Assert.IsFalse(result.WasSuccessful);
+      Assert.AreEqual(CommandExecutionStatus.ExecutionError, result.Status);
     }
     
     [TestMethod]
-    public async Task Execution_returns_null_should_throw()
+    public async Task Execution_returns_null_should_return_bad_result()
     {
       // arrange
       var command = CommandFactory.CreateAsync<TestCommand, string, int>("1");
       ((TestCommand)command).ThrowExecution = true;
 
       // act / assert
-      var exception = await Assert.ThrowsExceptionAsync<CommandExecutionException>(() => command.ExecuteAsync());
+      var result = await command.ExecuteAsync();
 
-      Assert.IsFalse(exception.CommandResult.WasSuccessful);
-      Assert.AreEqual(CommandExecutionStatus.ExecutionError, exception.CommandResult.Status);
+      Assert.IsFalse(result.WasSuccessful);
+      Assert.AreEqual(CommandExecutionStatus.ExecutionError, result.Status);
     }
     
     [TestMethod]
