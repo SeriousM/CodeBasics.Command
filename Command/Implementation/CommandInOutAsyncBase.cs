@@ -167,7 +167,7 @@ namespace CodeBasics.Command.Implementation
         if (Options.ThrowOnPreValidationFail)
         {
           var message = $"PreValidation failed for command '{GetType().FullName}':\n{result.Message}";
-          Logger.LogError(message);
+          Logger.LogError(result.Exception, message);
 
           throw new CommandExecutionException(message, result.Exception) { CommandResult = result };
         }
@@ -178,7 +178,7 @@ namespace CodeBasics.Command.Implementation
         if (Options.ThrowOnExecutionError)
         {
           var message = $"Execution failed for command '{GetType().FullName}':\n{result.Message}";
-          Logger.LogError(message);
+          Logger.LogError(result.Exception, message);
 
           throw new CommandExecutionException(message, result.Exception) { CommandResult = result };
         }
@@ -189,7 +189,7 @@ namespace CodeBasics.Command.Implementation
         if (Options.ThrowOnPostValidationFail)
         {
           var message = $"PostValidation failed for command '{GetType().FullName}':\n{result.Message}";
-          Logger.LogError(message);
+          Logger.LogError(result.Exception, message);
 
           throw new CommandExecutionException(message, result.Exception) { CommandResult = result };
         }
