@@ -1,4 +1,5 @@
 ﻿using System;
+using CodeBasics.Command.Extensions;
 
 namespace CodeBasics.Command.Implementation
 {
@@ -22,6 +23,8 @@ namespace CodeBasics.Command.Implementation
     }
 
     public string Message { get; private set; }
+    
+    public string UserMessage { get; private set; }
 
     public Exception Exception { get; private set; }
 
@@ -31,29 +34,25 @@ namespace CodeBasics.Command.Implementation
 
     public bool WasSuccessful => Status == CommandExecutionStatus.Success;
 
-    internal static IResult<TValue> PreValidationFail(string message)
+    internal static IResult<TValue> PreValidationFail(string message, Exception exception = null, string userMessage = null)
     {
-      return PreValidationFail(message, null);
+      exception?.WithUserMessage(userMessage);
+
+      return new Result<TValue> { Message = message, Status = CommandExecutionStatus.PreValidationFailed, Exception = exception, UserMessage = userMessage };
     }
 
-    internal static IResult<TValue> PreValidationFail(string message, Exception ex)
+    internal static IResult<TValue> PostValidationFail(string message, Exception exception = null, string userMessage = null)
     {
-      return new Result<TValue> { Message = message, Status = CommandExecutionStatus.PreValidationFailed, Exception = ex };
+      exception?.WithUserMessage(userMessage);
+
+      return new Result<TValue> { Message = message, Status = CommandExecutionStatus.PostValidationFalied, Exception = exception, UserMessage = userMessage };
     }
 
-    internal static IResult<TValue> PostValidationFail(string message)
+    internal static IResult<TValue> ExecutionError(string message, Exception exception, string userMessage = null)
     {
-      return PostValidationFail(message, null);
-    }
+      exception?.WithUserMessage(userMessage);
 
-    internal static IResult<TValue> PostValidationFail(string message, Exception ex)
-    {
-      return new Result<TValue> { Message = message, Status = CommandExecutionStatus.PostValidationFalied, Exception = ex };
-    }
-
-    internal static IResult<TValue> ExecutionError(string message, Exception exception)
-    {
-      return new Result<TValue> { Status = CommandExecutionStatus.ExecutionError, Message = message, Exception = exception };
+      return new Result<TValue> { Status = CommandExecutionStatus.ExecutionError, Message = message, Exception = exception, UserMessage = userMessage };
     }
 
     internal static IResult<TValue> Success(TValue result)
