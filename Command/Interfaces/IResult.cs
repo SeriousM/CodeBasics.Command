@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 
 namespace CodeBasics.Command
 {
@@ -6,9 +7,9 @@ namespace CodeBasics.Command
   {
     string Message { get; }
     
-    string UserMessage { get; }
+    string? UserMessage { get; }
 
-    Exception Exception { get; }
+    Exception? Exception { get; }
 
     CommandExecutionStatus Status { get; }
 
