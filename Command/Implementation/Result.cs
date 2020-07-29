@@ -10,9 +10,9 @@ namespace CodeBasics.Command.Implementation
       return Result<TValue>.Success(value);
     }
 
-    public static IResult<TValue> ExecutionError<TValue>(string message, Exception exception = null)
+    public static IResult<TValue> ExecutionError<TValue>(string message, Exception exception = null, string userMessage = null)
     {
-      return Result<TValue>.ExecutionError(message, exception);
+      return Result<TValue>.ExecutionError(message, exception, userMessage);
     }
   }
 
