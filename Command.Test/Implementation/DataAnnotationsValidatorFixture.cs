@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using CodeBasics.Command.Implementation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Logging.Internal;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
@@ -20,18 +19,24 @@ namespace CodeBasics.Command.Test.Implementation
     {
       var logger = new Mock<ILogger<DataAnnotationsValidator<List<int>>>>();
 
+      string loggedMessage = null;
+
       logger.Setup(
         l => l.Log(
           LogLevel.Error,
           0,
-          new FormattedLogValues($"The value of type '{typeof(List<int>)}' cannot be null.", null),
+          It.IsAny<It.IsAnyType>(),
           null,
-          It.IsAny<Func<object, Exception, string>>())).Verifiable();
+          It.IsAny<Func<It.IsAnyType, Exception, string>>()))
+            .Callback(new InvocationAction(i => loggedMessage = i.Arguments[2].ToString()))
+            .Verifiable();
       var validator = new DataAnnotationsValidator<List<int>>(logger.Object);
 
       await validator.ValidateAsync(null);
 
       logger.Verify();
+
+      Assert.AreEqual($"The value of type '{typeof(List<int>)}' cannot be null.", loggedMessage);
     }
 
     [TestMethod]
@@ -42,9 +47,9 @@ namespace CodeBasics.Command.Test.Implementation
         l => l.Log(
           LogLevel.Error,
           0,
-          It.IsAny<object>(),
+          It.IsAny<It.IsAnyType>(),
           null,
-          It.IsAny<Func<object, Exception, string>>())).Verifiable();
+          It.IsAny<Func<It.IsAnyType, Exception, string>>())).Verifiable();
       var validator = new DataAnnotationsValidator<SampleModel>(logger.Object);
 
       await validator.ValidateAsync(
@@ -64,9 +69,9 @@ namespace CodeBasics.Command.Test.Implementation
         l => l.Log(
           LogLevel.Debug,
           0,
-          It.IsAny<object>(),
+          It.IsAny<It.IsAnyType>(),
           null,
-          It.IsAny<Func<object, Exception, string>>())).Verifiable();
+          It.IsAny<Func<It.IsAnyType, Exception, string>>())).Verifiable();
       var validator = new DataAnnotationsValidator<SampleModel>(logger.Object);
 
       await validator.ValidateAsync(
