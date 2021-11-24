@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CodeBasics.Command.Implementation
 {
+  /// <inheritdoc cref="ICommandInOutAsync{TOut}"/>
   public abstract class CommandInOutAsyncBase<TIn, TOut> : ICommandInOutAsync<TOut>, ISetSetCommandInput<TIn>, IValidatorSetter<TIn, TOut>, ISetCommandOptions
   {
     private readonly object syncRoot = new object();
@@ -32,7 +33,12 @@ namespace CodeBasics.Command.Implementation
     /// The output validator. Can be overwritten in case the command itself wants to validate.
     /// </summary>
     protected IOutputValidator<TOut> OutputValidator { get; set; }
-
+    
+    public virtual Task<bool> CouldExecuteAsync()
+    {
+      return Task.FromResult(true);
+    }
+    
     async Task<IResult<TOut>> ICommandInOutAsync<TOut>.ExecuteAsync()
     {
       lock (syncRoot)
