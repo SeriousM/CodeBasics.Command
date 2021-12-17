@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using CodeBasics.Command.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace CodeBasics.Command.Implementation
@@ -94,7 +95,7 @@ namespace CodeBasics.Command.Implementation
         var preValidationStatus = await InputValidator.ValidateAsync(input);
         if (!preValidationStatus.IsValid)
         {
-          var preValidationFail = Result<TOut>.PreValidationFail($"Pre-Validation failed:\n{preValidationStatus.Message}");
+          var preValidationFail = Result<TOut>.PreValidationFail($"Pre-Validation failed:\n{preValidationStatus.Message}", null, preValidationStatus.UserMessage);
 
           return preValidationFail;
         }
@@ -149,7 +150,7 @@ namespace CodeBasics.Command.Implementation
         var postValidationStatus = await OutputValidator.ValidateAsync(commandExecutionResultValue);
         if (!postValidationStatus.IsValid)
         {
-          var postValidationFail = Result<TOut>.PostValidationFail($"Post-Validation failed:\n{postValidationStatus.Message}");
+          var postValidationFail = Result<TOut>.PostValidationFail($"Post-Validation failed:\n{postValidationStatus.Message}", null, postValidationStatus.UserMessage);
 
           return postValidationFail;
         }
@@ -175,7 +176,7 @@ namespace CodeBasics.Command.Implementation
           var message = $"PreValidation failed for command '{GetType().FullName}':\n{result.Message}";
           Logger.LogError(result.Exception, message);
 
-          throw new CommandExecutionException(message, result.Exception) { CommandResult = result };
+          throw new CommandExecutionException(message, result.Exception) { CommandResult = result }.WithUserMessage(result.UserMessage);
         }
       }
 
@@ -186,7 +187,7 @@ namespace CodeBasics.Command.Implementation
           var message = $"Execution failed for command '{GetType().FullName}':\n{result.Message}";
           Logger.LogError(result.Exception, message);
 
-          throw new CommandExecutionException(message, result.Exception) { CommandResult = result };
+          throw new CommandExecutionException(message, result.Exception) { CommandResult = result }.WithUserMessage(result.UserMessage);
         }
       }
 
@@ -197,7 +198,7 @@ namespace CodeBasics.Command.Implementation
           var message = $"PostValidation failed for command '{GetType().FullName}':\n{result.Message}";
           Logger.LogError(result.Exception, message);
 
-          throw new CommandExecutionException(message, result.Exception) { CommandResult = result };
+          throw new CommandExecutionException(message, result.Exception) { CommandResult = result }.WithUserMessage(result.UserMessage);
         }
       }
     }

@@ -107,7 +107,7 @@ namespace CodeBasics.Command.Test.Implementation
       };
       var logger = new Mock<ILogger<DataAnnotationsValidator<SampleModel>>>();
       var validator = Mock.CreateInstanceOf<DataAnnotationsValidator<SampleModel>>(
-        m => m.Setup(v => v.OnValidate(sampleModel)).Returns(new ValidationStatus(false)),
+        m => m.Setup(v => v.OnValidate(sampleModel)).Returns(ValidationStatus.Invalid()),
         logger.Object);
 
       var valid = await validator.ValidateAsync(

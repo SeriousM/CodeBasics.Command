@@ -5,28 +5,31 @@ namespace CodeBasics.Command.Implementation
 {
   public class ActionValidator<T> : IValidator<T>, IInputValidator<T>, IOutputValidator<T>
   {
-    private readonly Func<T, Task<bool>> validatorAsyncFunc;
+    private readonly Func<T, Task<ValidationStatus>> validatorAsyncFunc;
 
     public ActionValidator(Func<T, Task<bool>> validatorAsyncFunc)
     {
-      this.validatorAsyncFunc = validatorAsyncFunc ?? throw new ArgumentNullException(nameof(validatorAsyncFunc));
+      this.validatorAsyncFunc = async value => await validatorAsyncFunc(value) ? ValidationStatus.Valid : ValidationStatus.Invalid();
+    }
+
+    public ActionValidator(Func<T, Task<ValidationStatus>> validatorAsyncFunc)
+    {
+      this.validatorAsyncFunc = validatorAsyncFunc;
     }
 
     public ActionValidator(Func<T, bool> validatorFunc)
     {
-      if (validatorFunc == null)
-      {
-        throw new ArgumentNullException(nameof(validatorFunc));
-      }
+      validatorAsyncFunc = value => Task.FromResult(validatorFunc(value) ? ValidationStatus.Valid : ValidationStatus.Invalid());
+    }
 
+    public ActionValidator(Func<T, ValidationStatus> validatorFunc)
+    {
       validatorAsyncFunc = value => Task.FromResult(validatorFunc(value));
     }
 
-    public async Task<ValidationStatus> ValidateAsync(T value)
+    public Task<ValidationStatus> ValidateAsync(T value)
     {
-      var valid = await validatorAsyncFunc(value);
-
-      return new ValidationStatus(valid);
+      return validatorAsyncFunc(value);
     }
   }
 }

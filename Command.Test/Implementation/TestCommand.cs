@@ -24,7 +24,7 @@ namespace CodeBasics.Command.Test.Implementation
     {
       if (FailExecution)
       {
-        return Task.FromResult(Result.ExecutionError<int>("I have to stop this execution."));
+        return Task.FromResult(Result.ExecutionError<int>("I have to stop this execution.", null, "Execution User Message"));
       }
 
       if (ThrowExecution)

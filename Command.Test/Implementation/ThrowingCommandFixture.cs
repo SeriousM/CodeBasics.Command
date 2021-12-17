@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CodeBasics.Command.Extensions;
 using CodeBasics.Command.Implementation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -56,6 +57,21 @@ namespace CodeBasics.Command.Test.Implementation
     }
 
     [TestMethod]
+    public async Task InputValidation_fail_should_throw_with_usermessage()
+    {
+      // arrange
+      var command = CommandFactory.CreateAsync<TestCommand, string, int>("1");
+      ((IValidatorSetter<string, int>)command).SetInputValidator(new ActionValidator<string>(_ => ValidationStatus.Invalid(null, "PreValidation User Message")));
+
+      // act / assert
+      var exception = await Assert.ThrowsExceptionAsync<CommandExecutionException>(() => command.ExecuteAsync());
+
+      Assert.IsFalse(exception.CommandResult.WasSuccessful);
+      Assert.AreEqual(CommandExecutionStatus.PreValidationFailed, exception.CommandResult.Status);
+      Assert.AreEqual("PreValidation User Message", exception.GetUserMessage());
+    }
+
+    [TestMethod]
     public async Task OutputValidation_fail_should_throw()
     {
       // arrange
@@ -70,6 +86,21 @@ namespace CodeBasics.Command.Test.Implementation
     }
 
     [TestMethod]
+    public async Task OutputValidation_fail_should_throw_with_usermessage()
+    {
+      // arrange
+      var command = CommandFactory.CreateAsync<TestCommand, string, int>("1");
+      ((IValidatorSetter<string, int>)command).SetOutputValidator(new ActionValidator<int>(_ => ValidationStatus.Invalid(null, "PostValidation User Message")));
+
+      // act / assert
+      var exception = await Assert.ThrowsExceptionAsync<CommandExecutionException>(() => command.ExecuteAsync());
+
+      Assert.IsFalse(exception.CommandResult.WasSuccessful);
+      Assert.AreEqual(CommandExecutionStatus.PostValidationFalied, exception.CommandResult.Status);
+      Assert.AreEqual("PostValidation User Message", exception.GetUserMessage());
+    }
+
+    [TestMethod]
     public async Task Execution_failed_should_throw()
     {
       // arrange
@@ -81,6 +112,21 @@ namespace CodeBasics.Command.Test.Implementation
 
       Assert.IsFalse(exception.CommandResult.WasSuccessful);
       Assert.AreEqual(CommandExecutionStatus.ExecutionError, exception.CommandResult.Status);
+    }
+
+    [TestMethod]
+    public async Task Execution_failed_should_throw_with_usermessage()
+    {
+      // arrange
+      var command = CommandFactory.CreateAsync<TestCommand, string, int>("1");
+      ((TestCommand)command).FailExecution = true;
+
+      // act / assert
+      var exception = await Assert.ThrowsExceptionAsync<CommandExecutionException>(() => command.ExecuteAsync());
+
+      Assert.IsFalse(exception.CommandResult.WasSuccessful);
+      Assert.AreEqual(CommandExecutionStatus.ExecutionError, exception.CommandResult.Status);
+      Assert.AreEqual("Execution User Message", exception.GetUserMessage());
     }
 
     [TestMethod]

@@ -20,14 +20,14 @@ namespace CodeBasics.Command.Implementation
 
     protected ILogger<DataAnnotationsValidator<T>> Logger { get; }
 
-    public async Task<ValidationStatus> ValidateAsync(T value)
+    public Task<ValidationStatus> ValidateAsync(T value)
     {
       if (value == null)
       {
         var message = $"The value of type '{typeof(T)}' cannot be null.";
         Logger.LogError(message);
 
-        return new ValidationStatus(false, message);
+        return Task.FromResult(ValidationStatus.Invalid(message));
       }
 
       if (value is ICollection collection)
@@ -46,16 +46,16 @@ namespace CodeBasics.Command.Implementation
 
         if (failedValidations.Any())
         {
-          return new ValidationStatus(false, $"Following validations for '{typeof(T)}' failed:\n{string.Join("\n", failedValidations.Select(v => v.Message))}");
+          return Task.FromResult(ValidationStatus.Invalid($"Following validations for '{typeof(T)}' failed:\n{string.Join("\n", failedValidations.Select(v => v.Message))}"));
         }
 
-        return ValidationStatus.Valid;
+        return Task.FromResult(ValidationStatus.Valid);
       }
 
       var validationResult = validateItem(value);
       if (!validationResult.IsValid)
       {
-        return validationResult;
+        return Task.FromResult(validationResult);
       }
 
       var onValidateResult = OnValidate(value);
@@ -64,7 +64,7 @@ namespace CodeBasics.Command.Implementation
         Logger.LogError($"Validation of '{typeof(T)}' failed in {nameof(OnValidate)} method.");
       }
 
-      return onValidateResult;
+      return Task.FromResult(onValidateResult);
     }
 
     private ValidationStatus validateItem(object value)
@@ -74,7 +74,7 @@ namespace CodeBasics.Command.Implementation
         var message = "The item to validate is null.";
         Logger.LogError(message);
 
-        return new ValidationStatus(false, message);
+        return ValidationStatus.Invalid(message);
       }
 
       var type = value.GetType();
@@ -83,7 +83,8 @@ namespace CodeBasics.Command.Implementation
        || type.GetTypeInfo().IsGenericType
        && type.GetGenericTypeDefinition() == typeof(Nullable<>))
       {
-        return new ValidationStatus(true, $"Type '{type}' is primitive and is considered as valid.");
+        // The type is primitive and is considered as valid.
+        return ValidationStatus.Valid;
       }
 
       var validationResults = new List<ValidationResult>();
@@ -99,7 +100,7 @@ namespace CodeBasics.Command.Implementation
       {
         var validationReport = reportValidationResult(type, validationResults.ToArray());
 
-        return new ValidationStatus(false, validationReport);
+        return ValidationStatus.Invalid(validationReport);
       }
 
       Logger.LogDebug($"Validation of '{type}' succeeded.");
