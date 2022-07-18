@@ -35,9 +35,9 @@ namespace CodeBasics.Command.Implementation
     /// </summary>
     protected IOutputValidator<TOut> OutputValidator { get; set; }
     
-    public virtual Task<bool> CouldExecuteAsync()
+    Task<bool> ICommandInOutAsync<TOut>.CouldExecuteAsync()
     {
-      return Task.FromResult(true);
+      return couldExecuteCommandAsync();
     }
     
     async Task<IResult<TOut>> ICommandInOutAsync<TOut>.ExecuteAsync()
@@ -111,6 +111,23 @@ namespace CodeBasics.Command.Implementation
         return preValidationFail;
       }
     }
+
+    private async Task<bool> couldExecuteCommandAsync()
+    {
+      try
+      {
+        var couldExecutionResult = await OnCouldExecuteAsync(input);
+
+        return couldExecutionResult;
+      }
+      catch (Exception ex)
+      {
+        Logger.LogError(ex, "CouldExecuteCommand resulted in an exception.");
+
+        return false;
+      }
+    }
+
 
     private async Task<IResult<TOut>> executeCommandAsync()
     {
@@ -210,6 +227,11 @@ namespace CodeBasics.Command.Implementation
     void IValidatorSetter<TIn, TOut>.SetInputValidator(IInputValidator<TIn> validator) => InputValidator = validator;
 
     void IValidatorSetter<TIn, TOut>.SetOutputValidator(IOutputValidator<TOut> validator) => OutputValidator = validator;
+
+    protected internal virtual Task<bool> OnCouldExecuteAsync(TIn input)
+    {
+      return Task.FromResult(true);
+    }
 
     protected internal abstract Task<IResult<TOut>> OnExecuteAsync(TIn input);
   }

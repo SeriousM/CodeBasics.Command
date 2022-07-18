@@ -15,7 +15,7 @@ namespace CodeBasics.Command.Test.Implementation
     public bool ThrowExecution { get; set; }
     public bool ReturnNull { get; set; }
 
-    public override Task<bool> CouldExecuteAsync()
+    protected internal override Task<bool> OnCouldExecuteAsync(string input)
     {
       return Task.FromResult(true);
     }
